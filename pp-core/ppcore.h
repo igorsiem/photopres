@@ -3,6 +3,9 @@
 
 #include <string>
 
+/**
+ * \brief All core declaration related to the PhotoPres application
+ */
 namespace photopres {
 
 /**

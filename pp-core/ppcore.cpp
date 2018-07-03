@@ -2,7 +2,7 @@
 
 namespace photopres {
 
-static std::string version(void)
+std::string ppcore::version(void)
 {
     return "0.1";
 }   // end version method
