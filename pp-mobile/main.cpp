@@ -1,6 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "core.h"
+#include "ppcore.h"
 
 /**
  * @brief Entry point to the mobile application
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     // Register the C++ interface classes
-    qmlRegisterType<Core>("com.igorsiemienowicz.core", 1, 0, "Core");
+    qmlRegisterType<PpCore>("com.igorsiemienowicz.ppcore", 1, 0, "PpCore");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

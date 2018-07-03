@@ -1,5 +1,5 @@
 #include <QtTest>
-#include <ppcore.h>
+#include <core.h>
 
 /**
  * @brief Tests for the basic functionality of the core library
@@ -19,7 +19,7 @@ private slots:
 
 void basic::test_version()
 {
-    auto v = photopres::ppcore::version();
+    auto v = PhotoPres::Core::version();
     QVERIFY(v == "0.1");
 
 }   // end

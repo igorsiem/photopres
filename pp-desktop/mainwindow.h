@@ -2,7 +2,7 @@
 #define ppdesktop_mainwindow_h_included
 
 #include <QMainWindow>
-#include <ppcore.h>
+#include <core.h>
 
 /**
  * \brief User Interface elements

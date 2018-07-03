@@ -6,7 +6,7 @@
 /**
  * \brief All core declaration related to the PhotoPres application
  */
-namespace photopres {
+namespace PhotoPres {
 
 /**
  * @brief Main interface to PhotoPres core functionality
@@ -14,7 +14,7 @@ namespace photopres {
  * A single instance of this class is required to use the library. Multiple
  * instances are redundant, but OK.
  */
-class ppcore
+class Core
 {
 
     public:

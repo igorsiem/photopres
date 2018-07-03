@@ -14,7 +14,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    core.cpp
+    ppcore.cpp
 
 RESOURCES += qml.qrc
 
@@ -30,7 +30,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    core.h
+    ppcore.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../pp-core/release/ -lpp-core
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../pp-core/debug/ -lpp-core

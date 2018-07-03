@@ -1,6 +1,6 @@
 import QtQuick 2.9
 import QtQuick.Window 2.2
-import com.igorsiemienowicz.core 1.0
+import com.igorsiemienowicz.ppcore 1.0
 
 Window {
     visible: true
@@ -8,7 +8,7 @@ Window {
     height: 480
     title: qsTr("Hello World")
 
-    Core {
+    PpCore {
         id: core
     }
 

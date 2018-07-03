@@ -2,12 +2,12 @@
 #define ppmobile_core_h_included
 
 #include <QObject>
-#include <ppcore.h>
+#include <core.h>
 
 /**
- * @brief Wrapper for the 'raw' C++ PhotoCore class
+ * @brief Wrapper for the 'raw' C++ PhotoPres Core class
  */
-class Core : public QObject
+class PpCore : public QObject
 {
     Q_OBJECT
 
@@ -18,7 +18,7 @@ class Core : public QObject
      *
      * @param parent The parent object
      */
-    explicit Core(QObject *parent = nullptr);
+    explicit PpCore(QObject *parent = nullptr);
 
     // Version string for the Core library
     Q_PROPERTY(QString version READ version CONSTANT)

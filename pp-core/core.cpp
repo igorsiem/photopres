@@ -1,8 +1,8 @@
-#include "ppcore.h"
+#include "core.h"
 
-namespace photopres {
+namespace PhotoPres {
 
-std::string ppcore::version(void)
+std::string Core::version(void)
 {
     return "0.1";
 }   // end version method

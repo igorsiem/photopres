@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     QString versionString =
             tr("version: ")
-            + QString::fromStdString(photopres::ppcore::version());
+            + QString::fromStdString(PhotoPres::Core::version());
     ui->version->setText(versionString);
 }   // end constructor
 
