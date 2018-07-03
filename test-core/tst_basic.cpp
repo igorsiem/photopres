@@ -1,7 +1,5 @@
 #include <QtTest>
-#include "ppcore.h"
-
-// add necessary includes here
+#include <ppcore.h>
 
 /**
  * @brief Tests for the basic functionality of the core library
@@ -17,7 +15,7 @@ private slots:
      */
     void test_version();
 
-};
+};  // end basic test class
 
 void basic::test_version()
 {
