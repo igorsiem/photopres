@@ -1,7 +1,8 @@
-#ifndef ppcore_h_included
-#define ppcore_h_included
+#ifndef ppcore_core_h_included
+#define ppcore_core_h_included
 
 #include <string>
+#include "error.h"
 
 /**
  * \brief All core declaration related to the PhotoPres application
@@ -29,4 +30,10 @@ class Core
 
 }   // end photopres namespace
 
-#endif // ppcore_h_included
+#endif // ppcore_core_h_included
+
+/**
+ * \page ppcore_library The PP Core Library
+ *
+ * \todo Expand mid-level docs for the Core library
+ */
