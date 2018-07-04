@@ -1,7 +1,9 @@
 import QtQuick 2.9
-import QtQuick.Window 2.2
 import QtQuick.Controls 2.1
+import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.3
+import QtQuick.Window 2.2
+
 import com.igorsiemienowicz.ppcore 1.0
 
 ApplicationWindow {
@@ -10,16 +12,19 @@ ApplicationWindow {
     height: 480
     title: qsTr("PhotoPres")
 
+    // Core Application Interface
     PpCore {
         id: core
 
         onMessageBox: {
-            messageBoxHeading.text = mbHeading
-            messageBoxText.text = mbText
-            messageBox.open()
+            messageDialog.title = mbHeading
+            messageDialog.text = mbText
+            messageDialog.icon = iconCode
+            messageDialog.open()
         }
-    }
+    }   // end PpCore
 
+    // Main Layout of the Application Window
     ColumnLayout {
 
         Text {
@@ -31,30 +36,11 @@ ApplicationWindow {
             onClicked: core.makeAnError()
         }
 
+    }   // end main ColumnLayout
+
+    // Multi-purpose message dialog
+    MessageDialog {
+        id: messageDialog
     }
 
-    Popup {
-
-        id: messageBox
-        x: 100
-        y: 100
-        width: 200
-        height: 300
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        ColumnLayout {
-
-            Text {
-                id: messageBoxHeading
-            }
-
-            Text {
-                id: messageBoxText
-            }
-
-        }
-
-    }
-}
+}   // end ApplicationWindow

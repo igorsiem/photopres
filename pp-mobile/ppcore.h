@@ -1,9 +1,9 @@
-#ifndef ppmobile_core_h_included
-#define ppmobile_core_h_included
-
 #include <QObject>
 #include <QString>
 #include <core.h>
+
+#ifndef ppmobile_core_h_included
+#define ppmobile_core_h_included
 
 /**
  * @brief Wrapper for the 'raw' C++ PhotoPres Core class
@@ -59,8 +59,11 @@ class PpCore : public QObject
      * @param mbHeading The heading string
      *
      * @param mbText The text string
+     *
+     * @param iconCode The code for the icon to use (same as the
+     * QMessageBox::Icon enum values)
      */
-    void messageBox(QString mbHeading, QString mbText);
+    void messageBox(QString mbHeading, QString mbText, int iconCode = 0);
 
     public slots:
 

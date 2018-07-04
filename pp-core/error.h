@@ -1,3 +1,4 @@
+#include <QtDebug>
 #include <QException>
 #include <QString>
 #include <QTextStream>
@@ -63,6 +64,8 @@ class Error : public QException
     QString message; \
     QTextStream strm(&message); \
     strm << msg; \
+    qCritical() << __FILE__ << ":" << __LINE__ << " - signalling error: " << \
+        message; \
     ::PhotoPres::Error e(message); \
     e.raise(); } while (false)
 

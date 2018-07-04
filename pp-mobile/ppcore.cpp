@@ -61,5 +61,6 @@ void PpCore::makeAnError(void)
 
 void PpCore::signalError(QString action, QString message)
 {
-    emit messageBox(action, message);
+    // icon code is for critical error
+    emit messageBox(action, message, 3);
 }   // end signalError method
