@@ -1,2 +1,3 @@
-# photopres
+# PhotoPres
+
 Simple photo-based presentations
