@@ -32,6 +32,11 @@ public:
      */
     ~MainWindow();
 
+private slots:
+
+    // TODO Temporary demo code - delete
+    void on_errorButton_clicked();
+
 private:
 
     /**

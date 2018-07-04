@@ -2,10 +2,16 @@
 #define ppmobile_core_h_included
 
 #include <QObject>
+#include <QString>
 #include <core.h>
 
 /**
  * @brief Wrapper for the 'raw' C++ PhotoPres Core class
+ *
+ * This class also includes some utility methods to assist with interaction
+ * between the UI and the business logic of the application.
+ *
+ * @todo Expand class documentation
  */
 class PpCore : public QObject
 {
@@ -30,7 +36,31 @@ class PpCore : public QObject
      */
     QString version(void) const;
 
+    // TODO Temporary demo code - delete
+    Q_INVOKABLE void makeAnError(void);
+
+    /**
+     * @brief Signal an error to the user
+     *
+     * This is a utility method for signalling the User about an error, using a
+     * message box
+     *
+     * @param action The action that was being attempted when the error occurred
+     *
+     * @param message The human-readable error message
+     */
+    void signalError(QString action, QString message);
+
     signals:
+
+    /**
+     * @brief Request that the UI display a modal message box
+     *
+     * @param mbHeading The heading string
+     *
+     * @param mbText The text string
+     */
+    void messageBox(QString mbHeading, QString mbText);
 
     public slots:
 
