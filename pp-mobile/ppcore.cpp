@@ -40,7 +40,10 @@
                 "encountered")); \
     }
 
-PpCore::PpCore(QObject *parent) : QObject(parent), m_core()
+PpCore::PpCore(QObject *parent) :
+    QObject(parent),
+    m_settings("Igor Siemienowicz", "PhotoPres"),
+    m_core(m_settings)
 {
 }   // end constructor
 

@@ -24,7 +24,8 @@ class Core
 
     public:
 
-    Core(void) : m_settings("Igor Siemienowicz", "PhotoPres") {}
+    // Core(void) : m_settings("Igor Siemienowicz", "PhotoPres") {}
+    explicit Core(QSettings& settings) : m_settings(settings) {}
 
     /**
      * @brief Retrieve the version of the core library, as a std::string
@@ -32,13 +33,26 @@ class Core
      */
     static std::string version(void);
 
+    /**
+     * @brief Retrieve the current working folder from persistent settings
+     *
+     * @return The path to the current working folder
+     */
     QString currentFolder(void) const;
 
+    /**
+     * @brief Set the current working folder (recorded in persistent settings)
+     *
+     * @param cf The current folder path to set
+     */
     void setCurrentFolder(QString cf);
 
     protected:
 
-    QSettings m_settings;
+    /**
+     * @brief Reference to externally-supplied persistent settings object
+     */
+    QSettings& m_settings;
 
 };  // end ppcore class
 

@@ -2,6 +2,7 @@
 #define ppdesktop_mainwindow_h_included
 
 #include <QMainWindow>
+#include <QSettings>
 #include <core.h>
 
 /**
@@ -46,6 +47,12 @@ private:
      * @brief Internally-created UI elements
      */
     Ui::MainWindow *ui;
+
+    /**
+     * @brief Persistent settings object for recording configuration items that
+     * must persist between invocations
+     */
+    QSettings m_settings;
 
     /**
      * @brief PhotoPres core library functionality

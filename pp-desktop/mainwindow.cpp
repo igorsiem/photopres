@@ -7,7 +7,9 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_settings("Igor Siemienowicz", "PhotoPres"),
+    m_core(m_settings)
 {
     ui->setupUi(this);
     QString versionString =

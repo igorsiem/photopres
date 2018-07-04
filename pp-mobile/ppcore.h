@@ -1,4 +1,5 @@
 #include <QObject>
+#include <QSettings>
 #include <QString>
 #include <core.h>
 
@@ -26,6 +27,8 @@ class PpCore : public QObject
      */
     explicit PpCore(QObject *parent = nullptr);
 
+    // -- Accessors and Properties --
+
     // Version string for the Core library
     Q_PROPERTY(QString version READ version CONSTANT)
 
@@ -36,16 +39,33 @@ class PpCore : public QObject
      */
     QString version(void) const;
 
+    // The folder currently in use
     Q_PROPERTY(QString currentFolder READ currentFolder WRITE setCurrentFolder)
 
+    /**
+     * @brief Retrieve the path to the current folder (from core)
+     *
+     * Note: core retrieves this from persistent settings
+     *
+     * @return The current folder path
+     */
     QString currentFolder(void) const
         { return std::move(m_core.currentFolder()); }
 
+    /**
+     * @brief Set the current folder path in core
+     *
+     * Note that core takes care of recording this in persistent settings.
+     *
+     * @param cf The current folder path to set
+     */
     void setCurrentFolder(QString cf)
         { m_core.setCurrentFolder(std::move(cf)); }
 
     // TODO Temporary demo code - delete
     Q_INVOKABLE void makeAnError(void);
+
+    // -- Utilities --
 
     /**
      * @brief Signal an error to the user
@@ -76,6 +96,14 @@ class PpCore : public QObject
     public slots:
 
     protected:
+
+    // -- Attributes --
+
+    /**
+     * @brief Persistent settings object for recording configuration items that
+     * must persist between invocations
+     */
+    QSettings m_settings;
 
     /**
      * @brief The underlying PhotoPres Core object
