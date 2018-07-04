@@ -16,6 +16,7 @@ class MainWindow;
  */
 class MainWindow : public QMainWindow
 {
+
     Q_OBJECT
 
 public:
@@ -37,12 +38,20 @@ private slots:
     // TODO Temporary demo code - delete
     void on_errorButton_clicked();
 
+    void on_openBtn_clicked();
+
 private:
 
     /**
      * @brief Internally-created UI elements
      */
     Ui::MainWindow *ui;
-};
+
+    /**
+     * @brief PhotoPres core library functionality
+     */
+    PhotoPres::Core m_core;
+
+};  // end MainWindow class
 
 #endif // ppdesktop_mainwindow_h_included

@@ -36,6 +36,14 @@ class PpCore : public QObject
      */
     QString version(void) const;
 
+    Q_PROPERTY(QString currentFolder READ currentFolder WRITE setCurrentFolder)
+
+    QString currentFolder(void) const
+        { return std::move(m_core.currentFolder()); }
+
+    void setCurrentFolder(QString cf)
+        { m_core.setCurrentFolder(std::move(cf)); }
+
     // TODO Temporary demo code - delete
     Q_INVOKABLE void makeAnError(void);
 
@@ -66,6 +74,13 @@ class PpCore : public QObject
     void messageBox(QString mbHeading, QString mbText, int iconCode = 0);
 
     public slots:
+
+    protected:
+
+    /**
+     * @brief The underlying PhotoPres Core object
+     */
+    PhotoPres::Core m_core;
 
 };  // end Core class
 

@@ -33,7 +33,11 @@ ApplicationWindow {
 
         Button {
             text: "Open"
-            onClicked: core.makeAnError()
+            // onClicked: core.makeAnError()
+            onClicked: {
+                folderChooser.folder = core.currentFolder
+                folderChooser.open()
+            }
         }
 
     }   // end main ColumnLayout
@@ -41,6 +45,18 @@ ApplicationWindow {
     // Multi-purpose message dialog
     MessageDialog {
         id: messageDialog
+    }
+
+    FileDialog {
+        id: folderChooser
+        title: "Image folder"
+        // folder: shortcuts.pictures
+        selectMultiple: false
+        selectExisting: true
+        selectFolder: true
+        onAccepted: {
+            core.currentFolder = folderChooser.fileUrl
+        }
     }
 
 }   // end ApplicationWindow

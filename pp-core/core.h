@@ -2,6 +2,10 @@
 #define ppcore_core_h_included
 
 #include <string>
+
+#include <QSettings>
+#include <QString>
+
 #include "error.h"
 
 /**
@@ -20,11 +24,21 @@ class Core
 
     public:
 
+    Core(void) : m_settings("Igor Siemienowicz", "PhotoPres") {}
+
     /**
      * @brief Retrieve the version of the core library, as a std::string
      * @return The version string
      */
     static std::string version(void);
+
+    QString currentFolder(void) const;
+
+    void setCurrentFolder(QString cf);
+
+    protected:
+
+    QSettings m_settings;
 
 };  // end ppcore class
 

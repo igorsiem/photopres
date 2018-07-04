@@ -40,7 +40,7 @@
                 "encountered")); \
     }
 
-PpCore::PpCore(QObject *parent) : QObject(parent)
+PpCore::PpCore(QObject *parent) : QObject(parent), m_core()
 {
 }   // end constructor
 

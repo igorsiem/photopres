@@ -1,3 +1,5 @@
+#include <QFileDialog>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -29,3 +31,18 @@ void MainWindow::on_errorButton_clicked()
     }
     PPD_TOP_LEVEL_CATCH(tr("Test Test"))
 }   // end on_errorButton_clicked method
+
+void MainWindow::on_openBtn_clicked()
+{
+    PPD_TOP_LEVEL_TRY
+    {
+        auto dir = QFileDialog::getExistingDirectory(
+                    this,
+                    tr("Image folder"),
+                    m_core.currentFolder());
+        if (!dir.isEmpty()) m_core.setCurrentFolder(dir);
+
+        // TODO Set up the new view
+    }
+    PPD_TOP_LEVEL_CATCH("Open Folder")
+}   // end on_openBtn_clicked method
