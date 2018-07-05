@@ -6,7 +6,8 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES +=  tst_basic.cpp
+SOURCES += \ 
+    tst_core.cpp
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../pp-core/release/ -lpp-core
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../pp-core/debug/ -lpp-core

@@ -4,13 +4,15 @@
 #include <core.h>
 
 /**
- * @brief Tests for the basic functionality of the core library
+ * @brief Tests for the functionality of the core library
  */
-class basic : public QObject
+class core_tests : public QObject
 {
     Q_OBJECT
 
-private slots:
+    private slots:
+
+    // --- Misc. Tests ---
 
     /**
      * @brief Verify the functionality of the static version string retrieval
@@ -30,14 +32,16 @@ private slots:
      */
     void test_error(void);
 
-};  // end basic test class
+    // --- Metadata Item ---
 
-void basic::test_version(void)
+};  // end core_tests test class
+
+void core_tests::test_version(void)
 {
     QVERIFY(PhotoPres::Core::version() == "0.1");
 }   // end version test
 
-void basic::test_text_stream(void)
+void core_tests::test_text_stream(void)
 {
     QString buffer;
     QTextStream strm(&buffer);
@@ -47,7 +51,7 @@ void basic::test_text_stream(void)
     QCOMPARE(buffer, "Hello, there - 1 - 2 - 3");
 }   // end text stream test
 
-void basic::test_error(void)
+void core_tests::test_error(void)
 {
     try
     {
@@ -65,6 +69,6 @@ void basic::test_error(void)
     }
 }   // end error test
 
-QTEST_APPLESS_MAIN(basic)
+QTEST_APPLESS_MAIN(core_tests)
 
-#include "tst_basic.moc"
+#include "tst_core.moc"

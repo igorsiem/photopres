@@ -23,11 +23,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     core.cpp \
-    error.cpp
+    error.cpp \
+    metadataitem.cpp
 
 HEADERS += \
     core.h \
-    error.h
+    error.h \
+    metadataitem.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
