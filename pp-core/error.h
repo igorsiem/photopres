@@ -60,7 +60,27 @@ class Error : public QException
 
 }   // end PhotoPress namespace
 
+/**
+ * @brief Throw a PP Error exception with a message that supports streaming
+ *
+ * @param msg Human-readable description for the error; stream operator for
+ * message components is supported
+ */
 #define PP_RAISE_ERROR( msg ) do { \
+    QString message; \
+    QTextStream strm(&message); \
+    strm << msg; \
+    ::PhotoPres::Error e(message); \
+    e.raise(); } while (false)
+
+/**
+ * @brief Throw a PP Error exception with a message that supports streaming;
+ * message is sent to the qCritical log
+ *
+ * @param msg Human-readable description for the error; stream operator for
+ * message components is supported
+ */
+#define PP_RAISE_ERROR_AND_LOG( msg ) do { \
     QString message; \
     QTextStream strm(&message); \
     strm << msg; \

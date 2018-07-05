@@ -3,4 +3,5 @@ TEMPLATE = subdirs
 SUBDIRS += \
     pp-core \
     pp-desktop \
-    pp-mobile
+    pp-mobile \
+    test
