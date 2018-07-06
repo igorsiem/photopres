@@ -2,6 +2,8 @@
 #include <map>
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include <QString>
 
 #ifndef ppcore_metadataitem_h_included
@@ -88,7 +90,34 @@ extern void forEachNotEmpty(MetadataItemMap& map, MIValueUpdatingFn fn);
  *
  * @return The number of items in the collection with non-empty values
  */
-extern std::size_t sizeNonEmpty(const MetadataItemMap& map);
+extern std::size_t sizeNotEmpty(const MetadataItemMap& map);
+
+/**
+ * @brief Find a named (non-empty) value in the given collection
+ *
+ * @param map The collection in which to find the item
+ *
+ * @param name The name of the item to locate
+ *
+ * @return The (optional) non-empty value of the named item, if it exists
+ */
+extern boost::optional<QString> findNotEmpty(
+        const MetadataItemMap& map,
+        const QString& name);
+
+/**
+ * @brief Delete an item from the given MI container by name, whether it exists
+ * or not
+ *
+ * Note that this is a 'true' erase - we're not just setting the value to an
+ * empty string.
+ *
+ * @param map The container from which to erase
+ *
+ * @param name The name of the Item to erase; no error is signalled if it does
+ * not exist
+ */
+extern void erase(MetadataItemMap& map, const QString& name);
 
 }   // end PhotoPres namespace
 

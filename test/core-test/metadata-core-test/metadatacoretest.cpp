@@ -32,7 +32,7 @@ void MetadataCoreTest::crud(void)
     });
 
     QVERIFY(miMap.size() == 3);
-    QVERIFY(pp::sizeNonEmpty(miMap) == 2);
+    QVERIFY(pp::sizeNotEmpty(miMap) == 2);
 
     // The 'hasItem' function will find an item with name "a", but not for
     // names "b" or "c".
@@ -62,6 +62,17 @@ void MetadataCoreTest::crud(void)
     });
 
     QVERIFY(miMap["d"] == "4x");
+
+    // Find operations succeed for non-empty items - fail for empty /
+    // non-existent items.
+    QVERIFY(pp::findNotEmpty(miMap, "a").get() == "1");
+    QVERIFY(!pp::findNotEmpty(miMap, "b"));
+    QVERIFY(!pp::findNotEmpty(miMap, "c"));
+    QVERIFY(pp::findNotEmpty(miMap, "d").get() == "4x");
+
+    // Erase the "a" item
+    pp::erase(miMap, "a");
+    QVERIFY(!pp::findNotEmpty(miMap, "a"));
 
 }   // end crud test
 
