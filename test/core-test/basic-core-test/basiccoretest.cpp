@@ -15,7 +15,7 @@ class BasicCoreTest : public QObject
     /**
      * @brief Verify the functionality of the static version string retrieval
      */
-    void version();
+    void version(void);
 
     /**
      * @brief Verify the functionality of the `QTextStream` class
@@ -31,7 +31,7 @@ class BasicCoreTest : public QObject
     void test_error(void);
 };  // end BasicCoreTest class
 
-void BasicCoreTest::version()
+void BasicCoreTest::version(void)
 {
     QVERIFY(PhotoPres::Core::version() == "0.1");
 }

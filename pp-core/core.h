@@ -7,6 +7,7 @@
 #include <QString>
 
 #include "error.h"
+#include "metadataitem.h"
 
 /**
  * \brief All core declaration related to the PhotoPres application

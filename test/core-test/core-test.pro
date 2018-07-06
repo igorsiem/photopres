@@ -1,4 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    basic-core-test
+    basic-core-test \
+    metadata-core-test
