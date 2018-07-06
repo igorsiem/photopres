@@ -4,18 +4,18 @@
 #include <core.h>
 
 /**
- * @brief Tests for the basic functionality of the core library
+ * @brief Basic tests for the core library
  */
-class basic : public QObject
+class BasicCoreTest : public QObject
 {
     Q_OBJECT
 
-private slots:
+    private Q_SLOTS:
 
     /**
      * @brief Verify the functionality of the static version string retrieval
      */
-    void test_version(void);
+    void version(void);
 
     /**
      * @brief Verify the functionality of the `QTextStream` class
@@ -29,15 +29,14 @@ private slots:
      * @brief Verify that the error-raising macro works as expected
      */
     void test_error(void);
+};  // end BasicCoreTest class
 
-};  // end basic test class
-
-void basic::test_version(void)
+void BasicCoreTest::version(void)
 {
     QVERIFY(PhotoPres::Core::version() == "0.1");
-}   // end version test
+}
 
-void basic::test_text_stream(void)
+void BasicCoreTest::test_text_stream(void)
 {
     QString buffer;
     QTextStream strm(&buffer);
@@ -47,7 +46,7 @@ void basic::test_text_stream(void)
     QCOMPARE(buffer, "Hello, there - 1 - 2 - 3");
 }   // end text stream test
 
-void basic::test_error(void)
+void BasicCoreTest::test_error(void)
 {
     try
     {
@@ -65,6 +64,6 @@ void basic::test_error(void)
     }
 }   // end error test
 
-QTEST_APPLESS_MAIN(basic)
+QTEST_APPLESS_MAIN(BasicCoreTest)
 
-#include "tst_basic.moc"
+#include "basiccoretest.moc"

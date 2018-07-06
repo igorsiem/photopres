@@ -10,6 +10,10 @@ TARGET = pp-core
 TEMPLATE = lib
 CONFIG += staticlib
 
+# Add support for Boost includes
+unix:INCLUDEPATH += /usr/include/boost
+win32:INCLUDEPATH += $$(BOOST_ROOT)
+
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -23,11 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     core.cpp \
-    error.cpp
+    error.cpp \
+    metadata.cpp
 
 HEADERS += \
     core.h \
-    error.h
+    error.h \
+    metadata.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
