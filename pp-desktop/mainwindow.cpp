@@ -41,8 +41,13 @@ void MainWindow::on_openBtn_clicked()
         auto dir = QFileDialog::getExistingDirectory(
                     this,
                     tr("Image folder"),
-                    m_core.currentFolder());
-        if (!dir.isEmpty()) m_core.setCurrentFolder(dir);
+                    m_core.currentFolderPath());
+        if (!dir.isEmpty()) m_core.setCurrentFolderPath(dir);
+
+///        // TODO remove demo code
+///        QStringList imageFileNames = m_core.currentImageFileNameList();
+///        for (auto name : imageFileNames)
+///            qDebug() << "image file name: " << name;
 
         // TODO Set up the new view
     }

@@ -65,10 +65,10 @@ void MetadataCoreTest::crud(void)
 
     // Find operations succeed for non-empty items - fail for empty /
     // non-existent items.
-    QVERIFY(pp::findNotEmpty(miMap, "a").get() == "1");
+    QVERIFY(*pp::findNotEmpty(miMap, "a") == "1");
     QVERIFY(!pp::findNotEmpty(miMap, "b"));
     QVERIFY(!pp::findNotEmpty(miMap, "c"));
-    QVERIFY(pp::findNotEmpty(miMap, "d").get() == "4x");
+    QVERIFY(*pp::findNotEmpty(miMap, "d") == "4x");
 
     // Erase the "a" item
     pp::erase(miMap, "a");

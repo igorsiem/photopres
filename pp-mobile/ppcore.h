@@ -50,7 +50,7 @@ class PpCore : public QObject
      * @return The current folder path
      */
     QString currentFolder(void) const
-        { return std::move(m_core.currentFolder()); }
+        { return std::move(m_core.currentFolderPath()); }
 
     /**
      * @brief Set the current folder path in core
@@ -60,7 +60,7 @@ class PpCore : public QObject
      * @param cf The current folder path to set
      */
     void setCurrentFolder(QString cf)
-        { m_core.setCurrentFolder(std::move(cf)); }
+        { m_core.setCurrentFolderPath(std::move(cf)); }
 
     // TODO Temporary demo code - delete
     Q_INVOKABLE void makeAnError(void);

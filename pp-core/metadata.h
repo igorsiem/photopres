@@ -2,8 +2,6 @@
 #include <map>
 #include <memory>
 
-#include <boost/optional.hpp>
-
 #include <QString>
 
 #ifndef ppcore_metadataitem_h_included
@@ -99,9 +97,15 @@ extern std::size_t sizeNotEmpty(const MetadataItemMap& map);
  *
  * @param name The name of the item to locate
  *
- * @return The (optional) non-empty value of the named item, if it exists
+ * @return The non-empty value of the named item, if it exists, or `nullptr`
+ * if not
+ *
+ * @todo We'd be better off using `std::optional` or `boost::optional` for the
+ * return value, but `std::optional` isn't currently supported by the compilers
+ * we're using, and Boost seems to give the Android NDK compiler problems.
+ * Revisit this when we update our compilers.
  */
-extern boost::optional<QString> findNotEmpty(
+extern std::shared_ptr<QString> findNotEmpty(
         const MetadataItemMap& map,
         const QString& name);
 
