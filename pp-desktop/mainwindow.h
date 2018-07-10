@@ -1,8 +1,10 @@
 #ifndef ppdesktop_mainwindow_h_included
 #define ppdesktop_mainwindow_h_included
 
+#include <QLabel>
 #include <QMainWindow>
 #include <QSettings>
+
 #include <core.h>
 
 /**
@@ -36,15 +38,30 @@ class MainWindow : public QMainWindow
 
     private slots:
 
-    // TODO Temporary demo code - delete
-    void on_errorButton_clicked();
-
+    /**
+     * @brief Open / set the image folder
+     *
+     * This method is called when the User clicks the "Open" button. It opens
+     * a folder chooser dialog, and, if a folder with images is chosen, displays
+     * the first image.
+     */
     void on_openBtn_clicked();
 
     private:
 
+    /**
+     * @brief Retrieve the index of the currently displayed image (in the list
+     * from the current folder)
+     *
+     * @return The index of the displayed image, or -1 if there are no images
+     */
     int currentImageIndex(void) const { return m_core.currentImageIndex(); }
 
+    /**
+     * @brief Set the current image index, and display the image (if it exists)
+     *
+     * @param cii The image index to set
+     */
     void setCurrentImageIndex(int cii);
 
     /**
@@ -62,6 +79,11 @@ class MainWindow : public QMainWindow
      * @brief PhotoPres core library functionality
      */
     PhotoPres::Core m_core;
+
+    /**
+     * @brief The label used to display the image
+     */
+    QLabel* m_imageLbl;
 
 };  // end MainWindow class
 

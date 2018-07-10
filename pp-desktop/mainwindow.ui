@@ -29,15 +29,7 @@
          <height>527</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QLabel" name="imageLbl">
-          <property name="text">
-           <string>&lt;image&gt;</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <layout class="QVBoxLayout" name="verticalLayout_2"/>
       </widget>
      </widget>
     </item>
