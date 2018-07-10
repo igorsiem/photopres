@@ -16,6 +16,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Retrieve window geometry and state from persistent settings storage
+    m_settings.beginGroup("MainWindow");
+    restoreGeometry(m_settings.value("geometry").toByteArray());
+    restoreState(m_settings.value("state").toByteArray());
+    m_settings.endGroup();
+
     // Set up image / scrolling area manually
     ui->imageScrl->setBackgroundRole(QPalette::Dark);
 
@@ -30,10 +36,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }   // end constructor
 
-MainWindow::~MainWindow()
+MainWindow::~MainWindow(void)
 {
     delete ui;
 }   // end destructor
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    m_settings.beginGroup("MainWindow");
+    m_settings.setValue("geometry", saveGeometry());
+    m_settings.setValue("windowState", saveState());
+    m_settings.endGroup();
+
+    QMainWindow::closeEvent(event);
+}   // end closeEvent method
 
 void MainWindow::on_openBtn_clicked()
 {

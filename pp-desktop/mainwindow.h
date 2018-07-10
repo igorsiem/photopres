@@ -27,14 +27,22 @@ class MainWindow : public QMainWindow
     /**
      * @brief Constructor - sets up the UI
      *
-     * @param parent Parent object (usually `nullptr`
+     * @param parent Parent object (usually `nullptr`)
      */
     explicit MainWindow(QWidget *parent = 0);
 
     /**
      * \brief Destructor - destroys all UI objects
      */
-    ~MainWindow();
+    virtual ~MainWindow(void);
+
+    /**
+     * @brief Record window state and geometry in persistent settings when
+     * closing
+     *
+     * @param event The Close Event object (passed to base-class
+     */
+    virtual void closeEvent(QCloseEvent* event) override;
 
     private slots:
 
