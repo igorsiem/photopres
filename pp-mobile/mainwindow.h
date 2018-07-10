@@ -1,20 +1,20 @@
+#include <QDir>
 #include <QObject>
 #include <QSettings>
 #include <QString>
+#include <QUrl>
+
 #include <core.h>
 
 #ifndef ppmobile_core_h_included
 #define ppmobile_core_h_included
 
 /**
- * @brief Wrapper for the 'raw' C++ PhotoPres Core class
- *
- * This class also includes some utility methods to assist with interaction
- * between the UI and the business logic of the application.
+ * @brief Core functionality for the main Application Window
  *
  * @todo Expand class documentation
  */
-class PpCore : public QObject
+class ApplicationWindow : public QObject
 {
     Q_OBJECT
 
@@ -25,7 +25,7 @@ class PpCore : public QObject
      *
      * @param parent The parent object
      */
-    explicit PpCore(QObject *parent = nullptr);
+    explicit ApplicationWindow(QObject *parent = nullptr);
 
     // -- Accessors and Properties --
 
@@ -50,7 +50,7 @@ class PpCore : public QObject
      * @return The current folder path
      */
     QString currentFolder(void) const
-        { return std::move(m_core.currentFolderPath()); }
+        { return m_core.currentFolderPath(); }
 
     /**
      * @brief Set the current folder path in core
@@ -62,8 +62,47 @@ class PpCore : public QObject
     void setCurrentFolder(QString cf)
         { m_core.setCurrentFolderPath(std::move(cf)); }
 
-    // TODO Temporary demo code - delete
-    Q_INVOKABLE void makeAnError(void);
+    // The folder currently in use
+    Q_PROPERTY(
+            QString currentFolderUrl
+            READ currentFolderUrl
+            WRITE setCurrentFolderUrl)
+
+    /**
+     * @brief Retrieve the current operating folder in URL form
+     *
+     * @return The current folder as a URL
+     */
+    QString currentFolderUrl(void) const
+        { return QString("file:") + currentFolder(); }
+
+    /**
+     * @brief Set the current folder as a URL
+     *
+     * @param cfurl The URL of the current folder
+     */
+    void setCurrentFolderUrl(QString cfurl)
+        { setCurrentFolder(QUrl(cfurl).toLocalFile()); }
+
+    Q_PROPERTY(
+            int currentImageIndex
+            READ currentImageIndex
+            WRITE setCurrentImageIndex)
+
+    /**
+     * @brief Retrieve the index of the currently displayed image file
+     *
+     * @return The index, or -1 if no image file can be displayed
+     */
+    int currentImageIndex(void) const { return m_core.currentImageIndex(); }
+
+    /**
+     * @brief Set the currently displayed image index, causing the image to
+     * be displayed
+     *
+     * @param cii The index in the current file name list to display
+     */
+    void setCurrentImageIndex(int cii);
 
     // -- Utilities --
 
@@ -93,6 +132,13 @@ class PpCore : public QObject
      */
     void messageBox(QString mbHeading, QString mbText, int iconCode = 0);
 
+    /**
+     * @brief Load and display a given image in the Main Window
+     *
+     * @param path Path of the image file
+     */
+    void displayImage(QString path);
+
     public slots:
 
     protected:
@@ -110,6 +156,6 @@ class PpCore : public QObject
      */
     PhotoPres::Core m_core;
 
-};  // end Core class
+};  // end ApplicationWindow class
 
 #endif // ppmobile_core_h_included

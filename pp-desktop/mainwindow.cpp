@@ -1,4 +1,6 @@
 #include <QFileDialog>
+#include <QImageReader>
+#include <QPixmap>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -12,10 +14,23 @@ MainWindow::MainWindow(QWidget *parent) :
     m_core(m_settings)
 {
     ui->setupUi(this);
+
+    // TODO remove demo code around version label
+    /*
     QString versionString =
             tr("version: ")
             + QString::fromStdString(PhotoPres::Core::version());
+
     ui->version->setText(versionString);
+    */
+
+    // TODO improvements to image label set-up code
+    ui->imageLbl->setBackgroundRole(QPalette::Dark);
+    ui->imageLbl->setSizePolicy(
+                QSizePolicy::Ignored,
+                QSizePolicy::Ignored);
+    ui->imageLbl->setScaledContents(true);
+
 }   // end constructor
 
 MainWindow::~MainWindow()
@@ -42,14 +57,44 @@ void MainWindow::on_openBtn_clicked()
                     this,
                     tr("Image folder"),
                     m_core.currentFolderPath());
-        if (!dir.isEmpty()) m_core.setCurrentFolderPath(dir);
+        if (!dir.isEmpty())
+        {
+            m_core.setCurrentFolderPath(dir);
+            setCurrentImageIndex(0);
+        }
 
-///        // TODO remove demo code
-///        QStringList imageFileNames = m_core.currentImageFileNameList();
-///        for (auto name : imageFileNames)
-///            qDebug() << "image file name: " << name;
-
-        // TODO Set up the new view
     }
     PPD_TOP_LEVEL_CATCH("Open Folder")
 }   // end on_openBtn_clicked method
+
+void MainWindow::setCurrentImageIndex(int cii)
+{
+
+    m_core.setCurrentImageIndex(cii);
+
+    // If we have a valid indedx, display the image
+    if (m_core.currentImageIndex() >= 0)
+    {
+
+        ui->imageLbl->resize(ui->imageScrl->size());
+        QString imageFileName =
+                QDir(
+                    m_core.currentFolderPath()).filePath(
+                        m_core.currentImageFileNameList()[
+                            m_core.currentImageIndex()]);
+
+        QImageReader reader(imageFileName);
+        QPixmap pixmap = QPixmap::fromImage(reader.read());
+
+        ui->imageLbl->setPixmap(
+                    pixmap.scaled(
+                        ui->imageLbl->width(),
+                        ui->imageLbl->height(),
+                        Qt::KeepAspectRatio));
+        ui->imageLbl->adjustSize();
+
+        qDebug() << "loaded image file " << imageFileName;
+
+    }   // end if we have a valid current index
+
+}   //  end setCurrentImageIndex method

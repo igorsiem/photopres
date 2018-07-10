@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow
 
     Q_OBJECT
 
-public:
+    public:
 
     /**
      * @brief Constructor - sets up the UI
@@ -34,14 +34,18 @@ public:
      */
     ~MainWindow();
 
-private slots:
+    private slots:
 
     // TODO Temporary demo code - delete
     void on_errorButton_clicked();
 
     void on_openBtn_clicked();
 
-private:
+    private:
+
+    int currentImageIndex(void) const { return m_core.currentImageIndex(); }
+
+    void setCurrentImageIndex(int cii);
 
     /**
      * @brief Internally-created UI elements

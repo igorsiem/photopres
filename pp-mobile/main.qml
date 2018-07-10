@@ -4,7 +4,7 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.2
 
-import com.igorsiemienowicz.ppcore 1.0
+import com.igorsiemienowicz.mainwindow 1.0
 
 ApplicationWindow {
     visible: true
@@ -12,9 +12,9 @@ ApplicationWindow {
     height: 480
     title: qsTr("PhotoPres")
 
-    // Core Application Interface
-    PpCore {
-        id: core
+    // Main Window implementation
+    MainWindow {
+        id: mainWindow
 
         onMessageBox: {
             messageDialog.title = mbHeading
@@ -22,22 +22,32 @@ ApplicationWindow {
             messageDialog.icon = iconCode
             messageDialog.open()
         }
-    }   // end PpCore
+
+        onDisplayImage: {
+            image.source = path
+        }
+
+    }   // end MainWindow
 
     // Main Layout of the Application Window
     ColumnLayout {
 
         Text {
-            text: "Version: " + core.version
+            text: "Version: " + mainWindow.version
         }
 
         Button {
             text: "Open"
-            // onClicked: core.makeAnError()
             onClicked: {
-                folderChooser.folder = core.currentFolder
+                // console.log(mainWindow.currentFolder)
+                // folderChooser.folder = "file:" + mainWindow.currentFolder
+                folderChooser.folder = mainWindow.currentFolderUrl
                 folderChooser.open()
             }
+        }
+
+        Image {
+            id: image
         }
 
     }   // end main ColumnLayout
@@ -50,12 +60,16 @@ ApplicationWindow {
     FileDialog {
         id: folderChooser
         title: "Image folder"
-        // folder: shortcuts.pictures
         selectMultiple: false
         selectExisting: true
         selectFolder: true
         onAccepted: {
-            core.currentFolder = folderChooser.fileUrl
+            // mainWindow.currentFolder = folderChooser.folder
+            mainWindow.currentFolderUrl = folderChooser.folder
+            mainWindow.currentImageIndex = 0
+
+            // TODO remove demo code
+            // MainWindow.loadAndDisplayImage(0);
         }
     }
 
