@@ -1,6 +1,9 @@
 #include <QFileDialog>
+#include <QHBoxLayout>
 #include <QImageReader>
+#include <QLayout>
 #include <QPixmap>
+#include <QVBoxLayout>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -11,8 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_settings("Igor Siemienowicz", "PhotoPres"),
-    m_core(m_settings),
-    m_imageLbl(nullptr)
+    m_core(m_settings)
 {
     ui->setupUi(this);
 
@@ -22,17 +24,21 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreState(m_settings.value("state").toByteArray());
     m_settings.endGroup();
 
-    // Set up image / scrolling area manually
+    // Set some of the image / scrolling area stuff manually
     ui->imageScrl->setBackgroundRole(QPalette::Dark);
+    ui->imageLbl->setBackgroundRole(QPalette::Dark);
 
-    m_imageLbl = new  QLabel;
-    m_imageLbl->setBackgroundRole(QPalette::Dark);
-    m_imageLbl->setSizePolicy(
-                QSizePolicy::Ignored,
-                QSizePolicy::Ignored);
-    // m_imageLbl->setScaledContents(true);
-
-    ui->imageScrl->setWidget(m_imageLbl);
+    // TODO remove lorem ipsum code
+    ui->textLbl->setText("Lorem ipsum dolor sit amet, consectetur adipiscing "
+                         "elit. Quisque vestibulum vehicula accumsan. Fusce "
+                         "tempor velit in efficitur varius. Nam feugiat "
+                         "volutpat dolor in rhoncus. Duis cursus ullamcorper "
+                         "efficitur. Cras eget elit non metus viverra cursus "
+                         "eget nec ipsum. Morbi venenatis augue non felis "
+                         "condimentum efficitur. Vestibulum a rutrum velit, "
+                         "non maximus libero. In non sollicitudin mi. Nullam "
+                         "in nisi sed enim ultrices pulvinar eleifend sed "
+                         "diam.");
 
 }   // end constructor
 
@@ -51,7 +57,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
     QMainWindow::closeEvent(event);
 }   // end closeEvent method
 
-void MainWindow::on_openBtn_clicked()
+void MainWindow::on_openFolderAct_triggered()
 {
     PPD_TOP_LEVEL_TRY
     {
@@ -67,7 +73,7 @@ void MainWindow::on_openBtn_clicked()
 
     }
     PPD_TOP_LEVEL_CATCH("Open Folder")
-}   // end on_openBtn_clicked method
+}   // end on_openFolderAct_triggered method
 
 void MainWindow::setCurrentImageIndex(int cii)
 {
@@ -78,8 +84,7 @@ void MainWindow::setCurrentImageIndex(int cii)
     if (m_core.currentImageIndex() >= 0)
     {
 
-        m_imageLbl->resize(ui->imageScrl->size());
-
+        // Read the image from the file
         QString imageFileName =
                 QDir(
                     m_core.currentFolderPath()).filePath(
@@ -90,15 +95,43 @@ void MainWindow::setCurrentImageIndex(int cii)
         reader.setAutoTransform(true);
         QPixmap pixmap = QPixmap::fromImage(reader.read());
 
-        m_imageLbl->setPixmap(
+        // Create a new layout for the window, depending on whether the image
+        // is wide or tall. Also, constrain the maximum width of the text label
+        // when the text is placed on the right of the image.
+        QLayout* newLayout = nullptr;
+        if (pixmap.size().width() > pixmap.size().height())
+        {
+            newLayout = new QVBoxLayout;
+            ui->textLbl->setMaximumWidth(QWIDGETSIZE_MAX);
+        }
+        else
+        {
+            newLayout = new QHBoxLayout;
+            ui->textLbl->setMaximumWidth(this->size().width() / 3);
+        }
+
+        newLayout->addWidget(ui->imageScrl);
+        newLayout->addWidget(ui->textLbl);
+
+        delete ui->centralWidget->layout();
+        ui->centralWidget->setLayout(newLayout);
+
+        // We activate the layout at this point, so that the image is resized
+        // correctly.
+        newLayout->activate();
+
+        // Put the image pixmap into the image label
+        ui->imageLbl->resize(ui->imageScrl->size());
+
+        ui->imageLbl->setPixmap(
                     pixmap.scaled(
-                        m_imageLbl->width(),
-                        m_imageLbl->height(),
+                        ui->imageLbl->width(),
+                        ui->imageLbl->height(),
                         Qt::KeepAspectRatio,
                         Qt::SmoothTransformation)
                    );
 
-        m_imageLbl->adjustSize();
+        // ui->imageLbl->adjustSize();
 
         qDebug() << "loaded image file " << imageFileName;
 

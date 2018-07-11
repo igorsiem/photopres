@@ -49,13 +49,13 @@ class MainWindow : public QMainWindow
     /**
      * @brief Open / set the image folder
      *
-     * This method is called when the User clicks the "Open" button. It opens
-     * a folder chooser dialog, and, if a folder with images is chosen, displays
-     * the first image.
+     * This method is called when the User invokes the "Open Folder" button. It
+     * opens a folder chooser dialog, and, if a folder with images is chosen,
+     * displays the first image.
      */
-    void on_openBtn_clicked();
+    void on_openFolderAct_triggered();
 
-    private:
+private:
 
     /**
      * @brief Retrieve the index of the currently displayed image (in the list
@@ -87,11 +87,6 @@ class MainWindow : public QMainWindow
      * @brief PhotoPres core library functionality
      */
     PhotoPres::Core m_core;
-
-    /**
-     * @brief The label used to display the image
-     */
-    QLabel* m_imageLbl;
 
 };  // end MainWindow class
 
