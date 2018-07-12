@@ -84,6 +84,7 @@ class ApplicationWindow : public QObject
     void setCurrentFolderUrl(QString cfurl)
         { setCurrentFolder(QUrl(cfurl).toLocalFile()); }
 
+    // The index of the image currently being displayed
     Q_PROPERTY(
             int currentImageIndex
             READ currentImageIndex

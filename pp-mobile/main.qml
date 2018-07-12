@@ -32,15 +32,69 @@ ApplicationWindow {
 
     }   // end mainWindow
 
-    // The main display image
-    Image {
-        id: image
-        width: parent.width
+    // Main layout of the application in a gird
+    GridLayout {
+
+        id: mainGrid
         anchors.top: parent.top
         anchors.bottom: footerToolBar.top
-        fillMode: Image.PreserveAspectFit
-        autoTransform: true
-    }
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        // The central display image
+        Image {
+
+            id: image
+            Layout.row: 0
+            Layout.column: 0
+
+            fillMode: Image.PreserveAspectFit
+            autoTransform: true
+
+            Layout.maximumWidth: parent.width - rightText.width
+            Layout.maximumHeight: parent.height - rightText.height - 10
+
+            // When an image has finished loaded, select which text to display
+            onStatusChanged: {
+                if (image.status === Image.Ready) {
+                    if (image.width > image.height) {
+                        rightText.visible = false
+                        bottomText.visible = true
+
+                        console.log("wide image (landscape)")
+                    }
+                    else {
+                        rightText.visible = true
+                        bottomText.visible = false
+
+                        console.log("tall image (portrait)")
+                    }
+                }
+            }   // end onStatusChanged event handler
+
+        }   // end image
+
+        // Text the right (may or may not be visible)
+        Text {
+            id: rightText
+            text: "[right text]"
+
+            Layout.row: 0
+            Layout.column: 1
+            Layout.minimumWidth: parent.width / 3
+        }   // end rightText
+
+        // Text on the bottom (may or may not be visible)
+        Text {
+            id: bottomText
+            text: "[bottom text]"
+
+            Layout.row: 1
+            Layout.column: 0
+            Layout.alignment: Qt.AlignBottom
+        }   // end bottomText
+
+    }   // end mainGrid
 
     // The tool bar on the footer of the Main Window
     footer: ToolBar {
