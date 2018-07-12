@@ -4,4 +4,5 @@ SUBDIRS += \
     pp-core \
     pp-desktop \
     pp-mobile \
-    test
+    test \
+    third-party

@@ -7,6 +7,17 @@
 #ifndef ppcore_metadataitem_h_included
 #define ppcore_metadataitem_h_included
 
+/**
+ * \brief Declared shared pointer type for const and non-const instances of a
+ * class
+ *
+ * @param ClassName The name of the class; the corresponding type names will be
+ * ClassNamePtr and ConstClassNamePtr
+ */
+#define PP_DECLARE_SHARED_POINTERS_FOR( ClassName ) \
+    using ClassName##Ptr = std::shared_ptr<ClassName>; \
+    using Const##ClassName##Ptr = std::shared_ptr<const ClassName>;
+
 namespace PhotoPres {
 
 /**
@@ -14,20 +25,14 @@ namespace PhotoPres {
  */
 using MetadataItem = std::pair<QString, QString>;
 
-/**
- * @brief A shared pointer to a metadata item
- */
-using MetadataItemPtr = std::shared_ptr<MetadataItem>;
-
-/**
- * @brief A shared pointer to a const metadata item
- */
-using ConstMetadataItemPtr = std::shared_ptr<const MetadataItem>;
+PP_DECLARE_SHARED_POINTERS_FOR(MetadataItem)
 
 /**
  * @brief A simple name / value pair map for metadata items
  */
 using MetadataItemMap = std::map<QString, QString>;
+
+PP_DECLARE_SHARED_POINTERS_FOR(MetadataItemMap)
 
 /**
  * @brief Determine whether a metadata item map has a named item with a
@@ -122,6 +127,18 @@ extern std::shared_ptr<QString> findNotEmpty(
  * not exist
  */
 extern void erase(MetadataItemMap& map, const QString& name);
+
+/**
+ * \brief A 'map of maps' - collection of named Metadata Item Maps
+ *
+ * This is the type that is actually written to the PP data file. It is a
+ * simple, two-level hierarchy of strings, and should allow us to encapsulate
+ * all the information we want to about each image.
+ *
+ * The 'names' in this container are intended to be the names of the image files
+ * in the folder.
+ */
+using MetadataContainer = std::map<QString, MetadataItemMapPtr>;
 
 }   // end PhotoPres namespace
 
