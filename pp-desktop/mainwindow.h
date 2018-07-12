@@ -1,8 +1,10 @@
 #ifndef ppdesktop_mainwindow_h_included
 #define ppdesktop_mainwindow_h_included
 
+#include <QLabel>
 #include <QMainWindow>
 #include <QSettings>
+
 #include <core.h>
 
 /**
@@ -20,28 +22,55 @@ class MainWindow : public QMainWindow
 
     Q_OBJECT
 
-public:
+    public:
 
     /**
      * @brief Constructor - sets up the UI
      *
-     * @param parent Parent object (usually `nullptr`
+     * @param parent Parent object (usually `nullptr`)
      */
     explicit MainWindow(QWidget *parent = 0);
 
     /**
      * \brief Destructor - destroys all UI objects
      */
-    ~MainWindow();
+    virtual ~MainWindow(void);
 
-private slots:
+    /**
+     * @brief Record window state and geometry in persistent settings when
+     * closing
+     *
+     * @param event The Close Event object (passed to base-class
+     */
+    virtual void closeEvent(QCloseEvent* event) override;
 
-    // TODO Temporary demo code - delete
-    void on_errorButton_clicked();
+    private slots:
 
-    void on_openBtn_clicked();
+    /**
+     * @brief Open / set the image folder
+     *
+     * This method is called when the User invokes the "Open Folder" button. It
+     * opens a folder chooser dialog, and, if a folder with images is chosen,
+     * displays the first image.
+     */
+    void on_openFolderAct_triggered();
 
 private:
+
+    /**
+     * @brief Retrieve the index of the currently displayed image (in the list
+     * from the current folder)
+     *
+     * @return The index of the displayed image, or -1 if there are no images
+     */
+    int currentImageIndex(void) const { return m_core.currentImageIndex(); }
+
+    /**
+     * @brief Set the current image index, and display the image (if it exists)
+     *
+     * @param cii The image index to set
+     */
+    void setCurrentImageIndex(int cii);
 
     /**
      * @brief Internally-created UI elements

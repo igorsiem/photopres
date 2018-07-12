@@ -32,15 +32,15 @@ std::size_t sizeNotEmpty(const MetadataItemMap& map)
     });
 }   // end sizeNotEmpty function
 
-boost::optional<QString> findNotEmpty(
+extern std::shared_ptr<QString> findNotEmpty(
         const MetadataItemMap& map,
         const QString& name)
 {
     auto itr = map.find(name);
-    if (itr == map.end()) return boost::none;
-    else if (itr->second.isEmpty()) return boost::none;
+    if (itr == map.end()) return nullptr;
+    else if (itr->second.isEmpty()) return nullptr;
 
-    return itr->second;
+    return std::make_shared<QString>(itr->second);
 }   // end findNotEmpty function
 
 void erase(MetadataItemMap& map, const QString& name)

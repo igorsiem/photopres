@@ -1,4 +1,9 @@
 #include <QFileDialog>
+#include <QHBoxLayout>
+#include <QImageReader>
+#include <QLayout>
+#include <QPixmap>
+#include <QVBoxLayout>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -12,39 +17,124 @@ MainWindow::MainWindow(QWidget *parent) :
     m_core(m_settings)
 {
     ui->setupUi(this);
-    QString versionString =
-            tr("version: ")
-            + QString::fromStdString(PhotoPres::Core::version());
-    ui->version->setText(versionString);
+
+    // Retrieve window geometry and state from persistent settings storage
+    m_settings.beginGroup("MainWindow");
+    restoreGeometry(m_settings.value("geometry").toByteArray());
+    restoreState(m_settings.value("state").toByteArray());
+    m_settings.endGroup();
+
+    // Set some of the image / scrolling area stuff manually
+    ui->imageScrl->setBackgroundRole(QPalette::Dark);
+    ui->imageLbl->setBackgroundRole(QPalette::Dark);
+
+    // TODO remove lorem ipsum code
+    ui->textLbl->setText("Lorem ipsum dolor sit amet, consectetur adipiscing "
+                         "elit. Quisque vestibulum vehicula accumsan. Fusce "
+                         "tempor velit in efficitur varius. Nam feugiat "
+                         "volutpat dolor in rhoncus. Duis cursus ullamcorper "
+                         "efficitur. Cras eget elit non metus viverra cursus "
+                         "eget nec ipsum. Morbi venenatis augue non felis "
+                         "condimentum efficitur. Vestibulum a rutrum velit, "
+                         "non maximus libero. In non sollicitudin mi. Nullam "
+                         "in nisi sed enim ultrices pulvinar eleifend sed "
+                         "diam.");
+
 }   // end constructor
 
-MainWindow::~MainWindow()
+MainWindow::~MainWindow(void)
 {
     delete ui;
 }   // end destructor
 
-// TODO Temporary demo code - delete
-void MainWindow::on_errorButton_clicked()
+void MainWindow::closeEvent(QCloseEvent* event)
 {
-    PPD_TOP_LEVEL_TRY
-    {
-        PP_RAISE_ERROR("Test error");
-        // throw std::runtime_error("test");
-    }
-    PPD_TOP_LEVEL_CATCH(tr("Test Test"))
-}   // end on_errorButton_clicked method
+    m_settings.beginGroup("MainWindow");
+    m_settings.setValue("geometry", saveGeometry());
+    m_settings.setValue("windowState", saveState());
+    m_settings.endGroup();
 
-void MainWindow::on_openBtn_clicked()
+    QMainWindow::closeEvent(event);
+}   // end closeEvent method
+
+void MainWindow::on_openFolderAct_triggered()
 {
     PPD_TOP_LEVEL_TRY
     {
         auto dir = QFileDialog::getExistingDirectory(
                     this,
                     tr("Image folder"),
-                    m_core.currentFolder());
-        if (!dir.isEmpty()) m_core.setCurrentFolder(dir);
+                    m_core.currentFolderPath());
+        if (!dir.isEmpty())
+        {
+            m_core.setCurrentFolderPath(dir);
+            setCurrentImageIndex(0);
+        }
 
-        // TODO Set up the new view
     }
     PPD_TOP_LEVEL_CATCH("Open Folder")
-}   // end on_openBtn_clicked method
+}   // end on_openFolderAct_triggered method
+
+void MainWindow::setCurrentImageIndex(int cii)
+{
+
+    m_core.setCurrentImageIndex(cii);
+
+    // If we have a valid indedx, display the image
+    if (m_core.currentImageIndex() >= 0)
+    {
+
+        // Read the image from the file
+        QString imageFileName =
+                QDir(
+                    m_core.currentFolderPath()).filePath(
+                        m_core.currentImageFileNameList()[
+                            m_core.currentImageIndex()]);
+
+        QImageReader reader(imageFileName);
+        reader.setAutoTransform(true);
+        QPixmap pixmap = QPixmap::fromImage(reader.read());
+
+        // Create a new layout for the window, depending on whether the image
+        // is wide or tall. Also, constrain the maximum width of the text label
+        // when the text is placed on the right of the image.
+        QLayout* newLayout = nullptr;
+        if (pixmap.size().width() > pixmap.size().height())
+        {
+            newLayout = new QVBoxLayout;
+            ui->textLbl->setMaximumWidth(QWIDGETSIZE_MAX);
+        }
+        else
+        {
+            newLayout = new QHBoxLayout;
+            ui->textLbl->setMaximumWidth(this->size().width() / 3);
+        }
+
+        newLayout->addWidget(ui->imageScrl);
+        newLayout->addWidget(ui->textLbl);
+
+        delete ui->centralWidget->layout();
+        ui->centralWidget->setLayout(newLayout);
+
+        // We activate the layout at this point, so that the image is resized
+        // correctly.
+        newLayout->activate();
+
+        // Put the image pixmap into the image label
+        ui->imageLbl->resize(ui->imageScrl->size());
+
+        ui->imageLbl->setPixmap(
+                    pixmap.scaled(
+                        ui->imageLbl->width(),
+                        ui->imageLbl->height(),
+                        Qt::KeepAspectRatio,
+                        Qt::SmoothTransformation)
+                   );
+
+        // ui->imageLbl->adjustSize();
+
+        qDebug() << "loaded image file " << imageFileName;
+
+    }   // end if we have a valid current index
+
+}   //  end setCurrentImageIndex method
