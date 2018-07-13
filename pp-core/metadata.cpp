@@ -1,52 +1,86 @@
+#include <fstream>
+#include <iomanip>
+
+#include <QCoreApplication>
+
 #include "metadata.h"
+#include "error.h"
 
 namespace PhotoPres {
 
-bool hasItemNotEmpty(const MetadataItemMap& map, const QString& name)
-{
-    auto itr = map.find(name);
-    if (itr == map.end()) return false;
-    else return (!itr->second.isEmpty());
-}   // end hasItem
+const QString Metadata::m_metadataFileName = ".photopres.json";
 
-void forEachNotEmpty(const MetadataItemMap &map, ConstMIProcessingFn fn)
+Metadata::Metadata(QDir d) :
+    m_json(),
+    m_dir(std::move(d))
 {
-    for (auto& itr : map)
-        if (itr.second.isEmpty() == false) fn(itr.first, itr.second);
-}   // end forEachNotEmpty function
+}   // end constructor
 
-void forEachNotEmpty(MetadataItemMap& map, MIValueUpdatingFn fn)
+QString Metadata::caption(const QString& fileName) const
 {
-    for (auto& itr : map)
-        if (itr.second.isEmpty() == false) fn(itr.first, itr.second);
-}   // end forEachNotEmpty function
+    // We check to see if the JSON hierarchy components exist before loading
+    // loading them, to prevent them being created 'on the fly'.
+    if (m_json.find("files") != m_json.end())
+        if (m_json["files"].find(fileName.toStdString()) !=
+                m_json["files"].end())
+            if (m_json["files"][fileName.toStdString()].find("caption") !=
+                    m_json["files"][fileName.toStdString()].end())
+                return QString::fromStdString(
+                            m_json["files"][fileName.toStdString()]["caption"]);
 
-std::size_t sizeNotEmpty(const MetadataItemMap& map)
+    // If we didn't find an existing entry, return an empty string.
+    return QString();
+}   // end caption method
+
+void Metadata::setCaption(const QString& fileName, QString t)
 {
-    return std::count_if(
-                map.begin(),
-                map.end(),
-                [](MetadataItemMap::value_type pr)
+    m_json["files"][fileName.toStdString()]["caption"] = t.toStdString();
+}   // end setCaption method
+
+void Metadata::eraseCaption(const QString& fileName)
+{
+    if (m_json.find("files") != m_json.end())
     {
-        return !pr.second.isEmpty();
-    });
-}   // end sizeNotEmpty function
+        auto itr = m_json["files"].find(fileName.toStdString());
+        if (itr != m_json["files"].end())
+            m_json["files"].erase(itr);
+    }
+}   // end eraseCaption
 
-extern std::shared_ptr<QString> findNotEmpty(
-        const MetadataItemMap& map,
-        const QString& name)
+void Metadata::load(void)
 {
-    auto itr = map.find(name);
-    if (itr == map.end()) return nullptr;
-    else if (itr->second.isEmpty()) return nullptr;
 
-    return std::make_shared<QString>(itr->second);
-}   // end findNotEmpty function
+    m_json.clear();
 
-void erase(MetadataItemMap& map, const QString& name)
+    // Only attempt this if the file exists. If it does not exist, there is no
+    // error - just no data.
+    if (m_dir.exists(m_metadataFileName))
+    {
+        auto fileName = m_dir.filePath(m_metadataFileName).toStdString();
+        std::ifstream in(fileName);
+        if (!in) PP_RAISE_ERROR_AND_LOG(
+                    QCoreApplication::translate("Metadata", "could not open "
+                                                "file for reading - ") <<
+                    m_dir.filePath(m_metadataFileName));
+
+        in >> m_json;
+    }   // end if the file exists
+
+}   // end load method
+
+void Metadata::save(void) const
 {
-    auto itr = map.find(name);
-    if (itr != map.end()) map.erase(itr);
-}   // end erase function
+    // Attempt to open / create the file for writing
+    auto fileName = m_dir.filePath(m_metadataFileName).toStdString();
+    std::ofstream out(fileName);
+
+    if (!out) PP_RAISE_ERROR_AND_LOG(
+                QCoreApplication::translate("Metadata", "could not open "
+                                            "file for writing - ") <<
+                m_dir.filePath(m_metadataFileName));
+
+    // Output the file with 4-space pretty-printing
+    out << std::setw(4) << m_json;
+}   // end save method
 
 }   // end PhotoPres namespace
