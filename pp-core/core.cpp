@@ -30,6 +30,7 @@ void Core::setCurrentFolderPath(QString cf)
     // Invalidate the current file name list. It's a smart pointer, and will
     // be deleted automatically.
     m_currentImageFileNameList = nullptr;
+    m_metadata = nullptr;
 }   // end setCurrentFolder method
 
 const QStringList& Core::currentImageFileNameList(void) const
@@ -92,5 +93,38 @@ void Core::setCurrentImageIndex(int cii)
         m_currentImageIndex = m_currentImageFileNameList->size()-1;
     else m_currentImageIndex = cii;
 }   // end setCurrentImageIndex
+
+QString Core::captionFor(const QString& fileName) const
+{
+    return metadata().caption(fileName);
+}   // end captionFor method
+
+void Core::setCaptionFor(const QString& fileName, QString ct)
+{
+    metadata().setCaption(fileName, std::move(ct));
+    metadata().save();
+}   // end setCaptionFor method
+
+Metadata& Core::metadata(void)
+{
+    if (!m_metadata)
+    {
+        m_metadata = MetadataUpr(new Metadata(QDir(currentFolderPath())));
+        m_metadata->load();
+    }
+
+    return *m_metadata;
+}   // end metadata method
+
+const Metadata& Core::metadata(void) const
+{
+    if (!m_metadata)
+    {
+        m_metadata = MetadataUpr(new Metadata(QDir(currentFolderPath())));
+        m_metadata->load();
+    }
+
+    return *m_metadata;
+}   // end metadata method
 
 }   // end photopres namespace

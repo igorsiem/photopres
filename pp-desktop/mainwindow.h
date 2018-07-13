@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QSettings>
+#include <QShowEvent>
 
 #include <core.h>
 
@@ -44,6 +45,19 @@ class MainWindow : public QMainWindow
      */
     virtual void closeEvent(QCloseEvent* event) override;
 
+    /**
+     * @brief Show the first image in the current folder when the application
+     * is first started
+     *
+     * @param event The 'Show Event' (passed on to the base class
+     * implementation)
+     */
+    virtual void showEvent(QShowEvent* event) override
+    {
+        QMainWindow::showEvent(event);
+        setCurrentImageIndex(0);
+    }
+
     private slots:
 
     /**
@@ -55,7 +69,7 @@ class MainWindow : public QMainWindow
      */
     void on_openFolderAct_triggered();
 
-private:
+    private:
 
     /**
      * @brief Retrieve the index of the currently displayed image (in the list

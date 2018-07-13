@@ -28,18 +28,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->imageScrl->setBackgroundRole(QPalette::Dark);
     ui->imageLbl->setBackgroundRole(QPalette::Dark);
 
-    // TODO remove lorem ipsum code
-    ui->textLbl->setText("Lorem ipsum dolor sit amet, consectetur adipiscing "
-                         "elit. Quisque vestibulum vehicula accumsan. Fusce "
-                         "tempor velit in efficitur varius. Nam feugiat "
-                         "volutpat dolor in rhoncus. Duis cursus ullamcorper "
-                         "efficitur. Cras eget elit non metus viverra cursus "
-                         "eget nec ipsum. Morbi venenatis augue non felis "
-                         "condimentum efficitur. Vestibulum a rutrum velit, "
-                         "non maximus libero. In non sollicitudin mi. Nullam "
-                         "in nisi sed enim ultrices pulvinar eleifend sed "
-                         "diam.");
-
 }   // end constructor
 
 MainWindow::~MainWindow(void)
@@ -84,13 +72,15 @@ void MainWindow::setCurrentImageIndex(int cii)
     if (m_core.currentImageIndex() >= 0)
     {
 
-        // Read the image from the file
-        QString imageFileName =
-                QDir(
-                    m_core.currentFolderPath()).filePath(
-                        m_core.currentImageFileNameList()[
-                            m_core.currentImageIndex()]);
+        // Get the file name and its full path
+        auto fileNameInDir = m_core.currentImageFileNameList()[
+                m_core.currentImageIndex()];
+        auto imageFileName =
+                QDir(m_core.currentFolderPath()).filePath(fileNameInDir);
 
+        ui->textLbl->setText(m_core.captionFor(fileNameInDir));
+
+        // Read the image from the file
         QImageReader reader(imageFileName);
         reader.setAutoTransform(true);
         QPixmap pixmap = QPixmap::fromImage(reader.read());

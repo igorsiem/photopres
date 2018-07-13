@@ -34,6 +34,7 @@ class Core
     explicit Core(QSettings& settings) :
         m_settings(settings),
         m_currentImageFileNameList(nullptr),
+        m_metadata(nullptr),
         m_currentImageIndex(0)
     {}
 
@@ -92,7 +93,43 @@ class Core
      */
     void setCurrentImageIndex(int cii);
 
+    /**
+     * @brief Retrieve the caption for the given file from metadata
+     *
+     * @param fileName The name of the file
+     *
+     * @return The caption for the file
+     */
+    QString captionFor(const QString& fileName) const;
+
+    /**
+     * @brief Set the caption for the given file in metadata
+     *
+     * Note that the metadata is saved to the JSON file in this method.
+     *
+     * @param fileName The name of the file for the caption
+     *
+     * @param ct The caption
+     */
+    void setCaptionFor(const QString& fileName, QString ct);
+
     protected:
+
+    /**
+     * @brief Access the metadata object for this file, creating and loading it
+     * 'on the fly' if necessary
+     *
+     * @return A reference to the metadata object for this file
+     */
+    Metadata& metadata(void);
+
+    /**
+     * @brief Access the metadata object for this file, creating and loading it
+     * 'on the fly' if necessary
+     *
+     * @return A const reference to the metadata object for this file
+     */
+    const Metadata& metadata(void) const;
 
     /**
      * @brief Reference to externally-supplied persistent settings object
@@ -108,6 +145,15 @@ class Core
      * call to `currentImageFileNameList` recreates it.
      */
     mutable std::unique_ptr<QStringList> m_currentImageFileNameList;
+
+    /**
+     * @brief The metadata for the current directory
+     *
+     * This object is instantiated similarly to `m_currentImageFileNameList`.
+     * The first time is is required (in calls to access metadata) it is
+     * instantiated and loaded for the current directory.
+     */
+    mutable MetadataUpr m_metadata;
 
     /**
      * @brief The index -- in `m_currentImageFileNameList` -- of the image being
