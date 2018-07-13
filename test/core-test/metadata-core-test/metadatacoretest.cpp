@@ -6,6 +6,8 @@ namespace pp = PhotoPres;
 
 /**
  * @brief Tests of Metadata functionality in the Core library
+ *
+ * @todo Test for Metadata file writing and reading
  */
 class MetadataCoreTest : public QObject
 {
@@ -22,58 +24,29 @@ class MetadataCoreTest : public QObject
 
 void MetadataCoreTest::crud(void)
 {
+    namespace pp = PhotoPres;
 
-    // Create an MI map with two non-empty entries and an empty entry
-    pp::MetadataItemMap miMap(
-    {
-        {"a", "1"},
-        {"b", ""},      // note blank item
-        {"d", "4"}
-    });
+    pp::Metadata md(QDir("."));
 
-    QVERIFY(miMap.size() == 3);
-    QVERIFY(pp::sizeNotEmpty(miMap) == 2);
+    // Test no entry
+    QCOMPARE(md.caption("abc"), "");
 
-    // The 'hasItem' function will find an item with name "a", but not for
-    // names "b" or "c".
-    QVERIFY(pp::hasItemNotEmpty(miMap, "a") == true);
-    QVERIFY(pp::hasItemNotEmpty(miMap, "b") == false);
-    QVERIFY(pp::hasItemNotEmpty(miMap, "c") == false);
-    QVERIFY(pp::hasItemNotEmpty(miMap, "d") == true);
+    // Create a new entry
+    md.setCaption("abc", "Hello, there");
 
-    // Verify the 'for_each' function for metadata maps - lambda is only called
-    // for the items with non-empty values.
-    int counter = 0;
-    pp::forEachNotEmpty(miMap, [&counter](const QString& , const QString& value)
-    {
-        counter++;
-        QVERIFY2(value.isEmpty() == false, "for_each processed an item with an "
-                 "empty value");
-    });
+    // Retrieve existing entry
+    QCOMPARE(md.caption("abc"), "Hello, there");
 
-    QVERIFY2(counter == 2, "for_each processed an incorrect number of items "
-             "(expected 2)");
+    // Check another non-existent entry.
+    QCOMPARE(md.caption("xyz"), "");
 
-    // Verify 'for_each' with a value-updating function, to append a string to
-    // one of the values.
-    pp::forEachNotEmpty(miMap, [](const QString& name, QString& value)
-    {
-        if (name == "d") value += "x";
-    });
+    // Update an existing entry and check it.
+    md.setCaption("abc", "Goodbye");
+    QCOMPARE(md.caption("abc"), "Goodbye");
 
-    QVERIFY(miMap["d"] == "4x");
-
-    // Find operations succeed for non-empty items - fail for empty /
-    // non-existent items.
-    QVERIFY(*pp::findNotEmpty(miMap, "a") == "1");
-    QVERIFY(!pp::findNotEmpty(miMap, "b"));
-    QVERIFY(!pp::findNotEmpty(miMap, "c"));
-    QVERIFY(*pp::findNotEmpty(miMap, "d") == "4x");
-
-    // Erase the "a" item
-    pp::erase(miMap, "a");
-    QVERIFY(!pp::findNotEmpty(miMap, "a"));
-
+    // Erase a caption
+    md.eraseCaption(("abc"));
+    QCOMPARE(md.caption("abc"), "");
 }   // end crud test
 
 QTEST_APPLESS_MAIN(MetadataCoreTest)

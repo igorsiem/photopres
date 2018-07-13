@@ -1,144 +1,123 @@
-#include <functional>
-#include <map>
-#include <memory>
-
-#include <QString>
+#include <QDir>
+#include <nlohmann/json.hpp>
+#include "utils.h"
 
 #ifndef ppcore_metadataitem_h_included
 #define ppcore_metadataitem_h_included
 
-/**
- * \brief Declared shared pointer type for const and non-const instances of a
- * class
- *
- * @param ClassName The name of the class; the corresponding type names will be
- * ClassNamePtr and ConstClassNamePtr
- */
-#define PP_DECLARE_SHARED_POINTERS_FOR( ClassName ) \
-    using ClassName##Ptr = std::shared_ptr<ClassName>; \
-    using Const##ClassName##Ptr = std::shared_ptr<const ClassName>;
-
 namespace PhotoPres {
 
 /**
- * @brief A simple name/value pair - metadata for a picture
+ * @brief A class for accessing the metadata about files in the given directory
+ *
+ * Metadata about image files in a directory is held in a JSON file in the
+ * directory itself. This class maintains that file, allowing access to the
+ * data via conventional setters and getters.
+ *
+ * In this iteration, the only metadata item that is available for a file is
+ * the caption text.
  */
-using MetadataItem = std::pair<QString, QString>;
+class Metadata
+{
 
-PP_DECLARE_SHARED_POINTERS_FOR(MetadataItem)
+    // --- External Interface ---
 
-/**
- * @brief A simple name / value pair map for metadata items
- */
-using MetadataItemMap = std::map<QString, QString>;
+    public:
 
-PP_DECLARE_SHARED_POINTERS_FOR(MetadataItemMap)
+    /**
+     * @brief Construct the Metadata object for a given directory
+     *
+     * @param d The directory for which this object holds information
+     */
+    explicit Metadata(QDir d);
 
-/**
- * @brief Determine whether a metadata item map has a named item with a
- * non-empty value
- *
- * @param map The map to check
- *
- * @param name The name to check
- *
- * @return `true` if `map` has an entry with key `name` that is a non-empty
- * string
- */
-extern bool hasItemNotEmpty(const MetadataItemMap& map, const QString& name);
+    /**
+     * @brief Retrieve the caption for the given file in the directory
+     *
+     * If there is no entry for the file in the metadata, or no caption entry
+     * in the metadata for the file, an empty string is returned. Note that this
+     * method does *not* check to ensure that the file actually exists in the
+     * directory.
+     *
+     * @param fileName The name of the file
+     *
+     * @return The caption for the file, or an empty string if there is no entry
+     * for the file
+     */
+    QString caption(const QString& fileName) const;
 
-/**
- * @brief A callable object for processing const name / value pairs from a
- * metadata item
- */
-using ConstMIProcessingFn = std::function<void(const QString&, const QString&)>;
+    /**
+     * @brief Set the caption for the given file
+     *
+     * Note that this method does not check that the file actually exists in the
+     * directory.
+     *
+     * @param fileName The file name for which to set the caption
+     *
+     * @param t The caption text
+     */
+    void setCaption(const QString& fileName, QString t);
 
-/**
- * @brief Convenience function for iterating over the MI map, passing each name
- * and value to a given callable object
- *
- * Note that items with an empty value are skipped (as if they do not exist).
- *
- * @param map The MI map over which to iterate
- *
- * @param fn The callable object, lambda or function
- */
-extern void forEachNotEmpty(const MetadataItemMap& map, ConstMIProcessingFn fn);
+    /**
+     * @brief Erase the caption for a given file
+     *
+     * No error is raised if there is no existing caption for the file, or if
+     * the file itself does not exist.
+     *
+     * @param fileName The name of the file whose caption will be erased
+     */
+    void eraseCaption(const QString& fileName);
 
-/**
- * @brief A callable object for an MI that may update the passed value
- */
-using MIValueUpdatingFn = std::function<void(const QString&, QString&)>;
+    /**
+     * @brief Load the metadata JSON file from the directory
+     *
+     * Note that, if the file does not exist, no error is signalled. However,
+     * if the file exists, but there is a problem opening it, then an exception
+     * is thrown.
+     *
+     * @throw Error The file exists, but there was a problem opening it for
+     * reading
+     */
+    void load(void);
 
-/**
- * @brief Iterate over the given MI map with a callable that may update values
- * (but not names)
- *
- * @param map The map object over which to iterate
- *
- * @param fn The callable function / lamda / object
- */
-extern void forEachNotEmpty(MetadataItemMap& map, MIValueUpdatingFn fn);
+    /**
+     * @brief Save the Metadata to the JSON file in the directory
+     *
+     * @throw Error A problem occurred while creating or opening the file for
+     * writing
+     */
+    void save(void) const;
 
-/**
- * @brief Retrieve the size of the given MI map, *not counting empty items*
- *
- * The `MetadataItemMap::size` method will return the size of the map, with
- * empty items (which we usually ignore) included.
- *
- * Note that this method uses a straight `std::count_if` so it's not terribly
- * efficient.
- *
- * @param map The MI container to check
- *
- * @return The number of items in the collection with non-empty values
- */
-extern std::size_t sizeNotEmpty(const MetadataItemMap& map);
+    // --- Internal Declarations ---
 
-/**
- * @brief Find a named (non-empty) value in the given collection
- *
- * @param map The collection in which to find the item
- *
- * @param name The name of the item to locate
- *
- * @return The non-empty value of the named item, if it exists, or `nullptr`
- * if not
- *
- * @todo We'd be better off using `std::optional` or `boost::optional` for the
- * return value, but `std::optional` isn't currently supported by the compilers
- * we're using, and Boost seems to give the Android NDK compiler problems.
- * Revisit this when we update our compilers.
- */
-extern std::shared_ptr<QString> findNotEmpty(
-        const MetadataItemMap& map,
-        const QString& name);
+    protected:
 
-/**
- * @brief Delete an item from the given MI container by name, whether it exists
- * or not
- *
- * Note that this is a 'true' erase - we're not just setting the value to an
- * empty string.
- *
- * @param map The container from which to erase
- *
- * @param name The name of the Item to erase; no error is signalled if it does
- * not exist
- */
-extern void erase(MetadataItemMap& map, const QString& name);
+    /**
+     * @brief The JSON structure type
+     */
+    using json = nlohmann::json;
 
-/**
- * \brief A 'map of maps' - collection of named Metadata Item Maps
- *
- * This is the type that is actually written to the PP data file. It is a
- * simple, two-level hierarchy of strings, and should allow us to encapsulate
- * all the information we want to about each image.
- *
- * The 'names' in this container are intended to be the names of the image files
- * in the folder.
- */
-using MetadataContainer = std::map<QString, MetadataItemMapPtr>;
+    /**
+     * @brief The JSON structure used to hold the data, and serialise it to and
+     * from the metadata file
+     */
+    json m_json;
+
+    /**
+     * @brief The name of the file used to record metadata for a directory
+     */
+    static const QString m_metadataFileName;
+
+    /**
+     * @brief The directory for the metadata
+     *
+     * The metadata in this object covers the files in this directory.
+     */
+    QDir m_dir;
+
+};  // end Metadata class
+
+PP_DECLARE_POINTERS_FOR( Metadata )
 
 }   // end PhotoPres namespace
 
@@ -147,16 +126,5 @@ using MetadataContainer = std::map<QString, MetadataItemMapPtr>;
 /**
  * @page pp_metadata PhotoPres Metadata
  *
- * Metadata for photosin PhotoPres is represented in simple string name / value
- * pairs. Aliases on standard map and pair templates are used with QString for
- * this.
- *
- * A number of free functions are provided for searching and iterating over
- * metadata item collections. These are a bit more convenient than the 'raw'
- * implementations from the STL that they wrap. They also treat MI elements
- * with empty values as 'non-existent', so that they are not returned in
- * searches, and are skipped over in iterations. Otherwise, these functions
- * perform pretty much as one might expect.
- *
- * @todo Expand mid-level docs on Metadata
+ * @todo Write mid-level docs on Metadata
  */

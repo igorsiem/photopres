@@ -1,3 +1,6 @@
+// #include <sstream>
+// #include <iomanip>
+
 #include <QString>
 #include <QtTest>
 
@@ -42,12 +45,19 @@ void JsonTest::crud()
         QVERIFY(j["happy"] == true);
         QVERIFY(j["answer"]["everything"] == 42);
 
+        // Check the 'find' method.
+        QVERIFY(j.find("pi") != j.end());
+        QVERIFY(j.find("xyz") == j.end());
+
         // Erase an element
         QVERIFY(j["answer"].size() == 1);
         j["answer"].erase("everything");
         QVERIFY(j["answer"].size() == 0);
+        QVERIFY(j["answer"].find("everything") == j["answer"].end());
 
-        // qDebug() << j.dump().c_str();
+        // std::stringstream strm;
+        // strm << std::setw(4) << j;
+        // qDebug() << strm.str().c_str();
 
     }
     catch (...)

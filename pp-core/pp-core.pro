@@ -30,8 +30,10 @@ HEADERS += \
     core.h \
     error.h \
     metadata.h \
-    metadataserialiser.h
+    utils.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+INCLUDEPATH += $$PWD/../third-party
