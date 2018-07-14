@@ -35,5 +35,3 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
-
-INCLUDEPATH += $$PWD/../third-party

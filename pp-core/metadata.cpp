@@ -1,7 +1,7 @@
-#include <fstream>
-#include <iomanip>
-
+#include <QByteArray>
 #include <QCoreApplication>
+#include <QFile>
+#include <QJsonDocument>
 
 #include "metadata.h"
 #include "error.h"
@@ -18,52 +18,60 @@ Metadata::Metadata(QDir d) :
 
 QString Metadata::caption(const QString& fileName) const
 {
-    // We check to see if the JSON hierarchy components exist before loading
-    // loading them, to prevent them being created 'on the fly'.
-    if (m_json.find("files") != m_json.end())
-        if (m_json["files"].find(fileName.toStdString()) !=
-                m_json["files"].end())
-            if (m_json["files"][fileName.toStdString()].find("caption") !=
-                    m_json["files"][fileName.toStdString()].end())
-                return QString::fromStdString(
-                            m_json["files"][fileName.toStdString()]["caption"]);
+    return m_json["files"][fileName]["caption"].toString();
 
     // If we didn't find an existing entry, return an empty string.
-    return QString();
+    // return QString();
+
 }   // end caption method
 
 void Metadata::setCaption(const QString& fileName, QString t)
 {
-    m_json["files"][fileName.toStdString()]["caption"] = t.toStdString();
+
+    // Get out the objects and values we want, then put them back.
+    auto files = m_json["files"].toObject();
+    auto fileOb = files[fileName].toObject();
+
+    fileOb["caption"] = t;
+    files[fileName] = fileOb;
+    m_json["files"] = files;
+
 }   // end setCaption method
 
 void Metadata::eraseCaption(const QString& fileName)
 {
-    if (m_json.find("files") != m_json.end())
-    {
-        auto itr = m_json["files"].find(fileName.toStdString());
-        if (itr != m_json["files"].end())
-            m_json["files"].erase(itr);
-    }
+    auto files = m_json["files"].toObject();
+    auto fileOb = files[fileName].toObject();
+
+    auto itr = fileOb.find("caption");
+    if (itr != fileOb.end()) fileOb.erase(itr);
+
+    files[fileName] = fileOb;
+    m_json["files"] = files;
 }   // end eraseCaption
 
 void Metadata::load(void)
 {
 
-    m_json.clear();
+    // First, clear our existing data (if any)
+    m_json = QJsonObject();
 
     // Only attempt this if the file exists. If it does not exist, there is no
     // error - just no data.
     if (m_dir.exists(m_metadataFileName))
     {
-        auto fileName = m_dir.filePath(m_metadataFileName).toStdString();
-        std::ifstream in(fileName);
-        if (!in) PP_RAISE_ERROR_AND_LOG(
-                    QCoreApplication::translate("Metadata", "could not open "
-                                                "file for reading - ") <<
-                    m_dir.filePath(m_metadataFileName));
+        auto fileName = m_dir.filePath(m_metadataFileName);
 
-        in >> m_json;
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly))
+            PP_RAISE_ERROR_AND_LOG(
+                        QCoreApplication::translate(
+                            "Metadata", "could not open file for reading - ") <<
+                        m_dir.filePath(m_metadataFileName));
+
+        QByteArray data = file.readAll();
+        auto doc = QJsonDocument::fromJson(data);
+        m_json = doc.object();
     }   // end if the file exists
 
 }   // end load method
@@ -71,16 +79,17 @@ void Metadata::load(void)
 void Metadata::save(void) const
 {
     // Attempt to open / create the file for writing
-    auto fileName = m_dir.filePath(m_metadataFileName).toStdString();
-    std::ofstream out(fileName);
+    auto fileName = m_dir.filePath(m_metadataFileName);
+    QFile file(fileName);
 
-    if (!out) PP_RAISE_ERROR_AND_LOG(
-                QCoreApplication::translate("Metadata", "could not open "
-                                            "file for writing - ") <<
-                m_dir.filePath(m_metadataFileName));
+    if (!file.open(QIODevice::WriteOnly))
+        PP_RAISE_ERROR_AND_LOG(
+                    QCoreApplication::translate(
+                        "Metadata", "could not open file for writing - ") <<
+                    m_dir.filePath(m_metadataFileName));
 
-    // Output the file with 4-space pretty-printing
-    out << std::setw(4) << m_json;
+    QJsonDocument doc(m_json);
+    file.write(doc.toJson());
 }   // end save method
 
 }   // end PhotoPres namespace
