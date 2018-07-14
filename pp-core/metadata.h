@@ -1,5 +1,5 @@
 #include <QDir>
-#include <nlohmann/json.hpp>
+#include <QJsonObject>
 #include "utils.h"
 
 #ifndef ppcore_metadataitem_h_included
@@ -93,15 +93,10 @@ class Metadata
     protected:
 
     /**
-     * @brief The JSON structure type
-     */
-    using json = nlohmann::json;
-
-    /**
      * @brief The JSON structure used to hold the data, and serialise it to and
      * from the metadata file
      */
-    json m_json;
+    QJsonObject m_json;
 
     /**
      * @brief The name of the file used to record metadata for a directory

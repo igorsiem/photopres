@@ -43,8 +43,6 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../pp-core/debug/ -
 else:unix: LIBS += -L$$OUT_PWD/../pp-core/ -lpp-core
 
 INCLUDEPATH += $$PWD/../pp-core
-INCLUDEPATH += $$PWD/../third-party
-
 DEPENDPATH += $$PWD/../pp-core
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../pp-core/release/libpp-core.a
