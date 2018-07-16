@@ -57,16 +57,8 @@ void ApplicationWindow::setCurrentImageIndex(int cii)
     PPM_TOP_LEVEL_TRY
     {
         m_core.setCurrentImageIndex(cii);
-
-        // If we have a valid image index, then we can get a valid image file
-        if (m_core.currentImageIndex() >= 0)
-        {
-            QString imageFileNameUrl = currentFolderUrl() + "/" +
-                    m_core.currentImageFileNameList()[
-                        m_core.currentImageIndex()];
-            emit displayImage(imageFileNameUrl);
-            qDebug() << "displayed " << imageFileNameUrl;
-        }
+        auto imageFileUrl = currentFileNameUrl();
+        if (!imageFileUrl.isEmpty()) emit displayImage(imageFileUrl);
     }
     PPM_TOP_LEVEL_CATCH("Loading and Displaying an Image")
 }   // end setCurrentImageIndex method

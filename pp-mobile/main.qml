@@ -13,12 +13,15 @@ ApplicationWindow {
     height: 480
     title: qsTr("PhotoPres")
 
-///    Component.onCompleted: {
-///        mainWindow.currentImageIndex = 0;
-///    }
+    // After the main window loads, ask the user for a starting directory.
+    Component.onCompleted: {
+        folderChooser.folder = mainWindow.currentFolderUrl
+        folderChooser.open()
+    }
 
     // The Main Window implementation object
     MainWindow {
+
         id: mainWindow
 
         // Implement the `messageBox` signal by displaing the Message Dialog
@@ -51,56 +54,72 @@ ApplicationWindow {
             id: image
             Layout.row: 0
             Layout.column: 0
+            horizontalAlignment: Image.AlignLeft
 
             fillMode: Image.PreserveAspectFit
             autoTransform: true
 
-            Layout.maximumWidth: parent.width - rightText.width
-            Layout.maximumHeight: parent.height - rightText.height - 10
-
-            // When an image has finished loaded, select which text to display
-            // (side or bottom)
+            // When an image has finished loaded, update the layout, so that
+            // the caption text is where we want it.
             onStatusChanged: {
+
                 if (image.status === Image.Ready) {
 
                     // Use the dimensions of the image source to determine
                     // whether the image is landscape or portrait.
                     if (image.sourceSize.width > image.sourceSize.height) {
-                        rightText.visible = false
-                        bottomText.visible = true
+                        textEdt.setBottom()
+
+                        Layout.maximumWidth = -1
+                        Layout.maximumHeight =
+                                parent.height - textEdt.height - 10
 
                         console.log("wide image (landscape)")
                     }
                     else {
-                        rightText.visible = true
-                        bottomText.visible = false
+                        textEdt.setSide()
+
+                        Layout.maximumWidth = parent.width - textEdt.width
+                        Layout.maximumHeight = parent.height
 
                         console.log("tall image (portrait)")
                     }
-                }
+
+                }   // end onStatusChanged handler
+
             }   // end onStatusChanged event handler
 
         }   // end image
 
-        // Text the right (may or may not be visible)
-        Text {
-            id: rightText
-            text: "[right text]"
+        // The caption that can be edited
+        TextEdit {
 
-            Layout.row: 0
-            Layout.column: 1
-            Layout.minimumWidth: parent.width / 3
+            id: textEdt
+            text: "[text]"
+            readOnly: true
+
+            // Layout.row: 0
+            // Layout.column: 1
+
+            // Put the caption text at the bottom of the grid
+            function setBottom() {
+                Layout.row = 1
+                Layout.column = 0
+                Layout.minimumWidth = -1
+
+                console.log("set bottom")
+            }
+
+            // Put the caption text on the side of the grid
+            function setSide() {
+                Layout.row = 0
+                Layout.column = 1
+                Layout.minimumWidth = parent.width / 3
+
+                console.log("set side")
+            }
+
         }   // end rightText
-
-        // Text on the bottom (may or may not be visible)
-        Text {
-            id: bottomText
-            text: "[bottom text]"
-
-            Layout.row: 1
-            Layout.column: 0
-            Layout.alignment: Qt.AlignBottom
-        }   // end bottomText
 
     }   // end mainGrid
 
@@ -108,16 +127,32 @@ ApplicationWindow {
     footer: ToolBar {
 
         id: footerToolBar
+        RowLayout {
 
-        // Choose a folder of images
-        ToolButton {
-            id: openBtn
-            text: "Open"
-            onClicked: {
-                folderChooser.folder = mainWindow.currentFolderUrl
-                folderChooser.open()
-            }
-        }
+            // Choose a folder of images
+            ToolButton {
+                id: openBtn
+                text: "Open"           
+                onClicked: {
+                    folderChooser.folder = mainWindow.currentFolderUrl
+                    folderChooser.open()
+                }
+            }   // end openBtn
+
+            // Edit the caption for the current image
+            ToolButton {
+                id: editBtn
+                text: "Edit Caption"
+                checkable: true
+                onClicked: {
+                    mainWindow.signalError(
+                                "Edit Caption",
+                                "Capability not implemented yet");
+                }   // end onClicked method
+            }   // end editBtn
+
+        }   // end RowLayout
+
     }   // end footerToolbar
 
     // Multi-purpose message dialog
@@ -127,15 +162,20 @@ ApplicationWindow {
 
     // The Folder Chooser dialog
     FileDialog {
+
         id: folderChooser
         title: "Image folder"
         selectMultiple: false
         selectExisting: true
         selectFolder: true
+
+        // When the user chooses a folder, set it in the core application
+        // object, and move to the first image in the sequence
         onAccepted: {
             mainWindow.currentFolderUrl = folderChooser.folder
             mainWindow.currentImageIndex = 0
         }
+
     }   // end fileDialog
 
 }   // end ApplicationWindow

@@ -74,7 +74,7 @@ class ApplicationWindow : public QObject
      * @return The current folder as a URL
      */
     QString currentFolderUrl(void) const
-        { return QString("file:") + currentFolder(); }
+        { return QString("file://") + currentFolder(); }
 
     /**
      * @brief Set the current folder as a URL
@@ -105,7 +105,34 @@ class ApplicationWindow : public QObject
      */
     void setCurrentImageIndex(int cii);
 
-    // -- Utilities --
+    // The current file name, indicated by the current image index
+    Q_PROPERTY(QString currentFileName READ currentFileName)
+
+    /**
+     * @brief Retrieve the name of the image file currently indicated by the
+     * image index
+     *
+     * @return The image file name (without a path), or an empty string if there
+     * is no current file
+     */
+    QString currentFileName(void) const { return m_core.currentFileName(); }
+
+    // The full URL of the current image  file
+    Q_PROPERTY(QString currentFileNameUrl READ currentFileNameUrl)
+
+    /**
+     * @brief Retrieve the full URL of the file indication by the current
+     * image index
+     *
+     * @return The full URL of the current file, or an empty string if there
+     * is no current file
+     */
+    QString currentFileNameUrl(void)
+    {
+        auto fn = currentFileName();
+        if (fn.isEmpty()) return QString();
+        else return currentFolderUrl() + "/" + fn;
+    }
 
     /**
      * @brief Signal an error to the user
@@ -117,7 +144,9 @@ class ApplicationWindow : public QObject
      *
      * @param message The human-readable error message
      */
-    void signalError(QString action, QString message);
+    Q_INVOKABLE void signalError(QString action, QString message);
+
+    // -- Utilities --
 
     signals:
 
