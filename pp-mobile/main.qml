@@ -13,6 +13,10 @@ ApplicationWindow {
     height: 480
     title: qsTr("PhotoPres")
 
+///    Component.onCompleted: {
+///        mainWindow.currentImageIndex = 0;
+///    }
+
     // The Main Window implementation object
     MainWindow {
         id: mainWindow
@@ -55,9 +59,13 @@ ApplicationWindow {
             Layout.maximumHeight: parent.height - rightText.height - 10
 
             // When an image has finished loaded, select which text to display
+            // (side or bottom)
             onStatusChanged: {
                 if (image.status === Image.Ready) {
-                    if (image.width > image.height) {
+
+                    // Use the dimensions of the image source to determine
+                    // whether the image is landscape or portrait.
+                    if (image.sourceSize.width > image.sourceSize.height) {
                         rightText.visible = false
                         bottomText.visible = true
 
