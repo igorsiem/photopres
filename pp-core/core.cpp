@@ -94,6 +94,13 @@ void Core::setCurrentImageIndex(int cii)
     else m_currentImageIndex = cii;
 }   // end setCurrentImageIndex
 
+QString Core::currentFileName(void) const
+{
+    auto cii = currentImageIndex();
+    if (cii >= 0) return currentImageFileNameList()[cii];
+    else return QString();
+}   // end currentFileName
+
 QString Core::captionFor(const QString& fileName) const
 {
     return metadata().caption(fileName);
@@ -104,6 +111,12 @@ void Core::setCaptionFor(const QString& fileName, QString ct)
     metadata().setCaption(fileName, std::move(ct));
     metadata().save();
 }   // end setCaptionFor method
+
+void Core::eraseCaptionFor(const QString& fileName)
+{
+    metadata().eraseCaption(fileName);
+    metadata().save();
+}   // end eraseCaptionFor method
 
 Metadata& Core::metadata(void)
 {

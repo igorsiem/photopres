@@ -94,6 +94,15 @@ class Core
     void setCurrentImageIndex(int cii);
 
     /**
+     * @brief Retrieve the file name (without path) of the image currently
+     * being displayed
+     *
+     * @return The file name, or an empty string if no file name is currently
+     * being displayed
+     */
+    QString currentFileName(void) const;
+
+    /**
      * @brief Retrieve the caption for the given file from metadata
      *
      * @param fileName The name of the file
@@ -112,6 +121,15 @@ class Core
      * @param ct The caption
      */
     void setCaptionFor(const QString& fileName, QString ct);
+
+    /**
+     * @brief Erase the caption for the given file
+     *
+     * Note that the metadata is saved after erasing.
+     *
+     * @param fileName The name of the file whose caption is being erased
+     */
+    void eraseCaptionFor(const QString& fileName);
 
     protected:
 

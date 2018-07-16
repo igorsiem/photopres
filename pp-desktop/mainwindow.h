@@ -67,9 +67,15 @@ class MainWindow : public QMainWindow
      * opens a folder chooser dialog, and, if a folder with images is chosen,
      * displays the first image.
      */
-    void on_openFolderAct_triggered();
+    void on_openFolderAct_triggered(void);
+
+    void on_editCaptionAct_triggered(void);
+
+    // --- Internal Declarations ---
 
     private:
+
+    // -- Internal Helper Methods --
 
     /**
      * @brief Retrieve the index of the currently displayed image (in the list
@@ -85,6 +91,12 @@ class MainWindow : public QMainWindow
      * @param cii The image index to set
      */
     void setCurrentImageIndex(int cii);
+
+    void beginCaptionEdit(void);
+
+    void endCaptionEdit(void);
+
+    // -- Attributes --
 
     /**
      * @brief Internally-created UI elements

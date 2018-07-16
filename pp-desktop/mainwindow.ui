@@ -26,7 +26,7 @@
          <x>0</x>
          <y>0</y>
          <width>996</width>
-         <height>672</height>
+         <height>495</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -72,18 +72,18 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="textLbl">
+     <widget class="QTextEdit" name="textEdt">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="text">
-       <string>&lt;text&gt;</string>
-      </property>
-      <property name="wordWrap">
+      <property name="readOnly">
        <bool>true</bool>
+      </property>
+      <property name="placeholderText">
+       <string>[text]</string>
       </property>
      </widget>
     </item>
@@ -106,6 +106,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="openFolderAct"/>
+   <addaction name="editCaptionAct"/>
   </widget>
   <action name="openFolderAct">
    <property name="text">
@@ -116,6 +117,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="editCaptionAct">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Edit Caption</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit the caption  for the current image</string>
    </property>
   </action>
  </widget>

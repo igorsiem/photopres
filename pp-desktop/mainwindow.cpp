@@ -63,22 +63,41 @@ void MainWindow::on_openFolderAct_triggered()
     PPD_TOP_LEVEL_CATCH("Open Folder")
 }   // end on_openFolderAct_triggered method
 
+void MainWindow::on_editCaptionAct_triggered(void)
+{
+    if (ui->editCaptionAct->isChecked()) beginCaptionEdit();
+    else endCaptionEdit();
+}   // end on_editCaptionAct_triggered
+
 void MainWindow::setCurrentImageIndex(int cii)
 {
 
-    m_core.setCurrentImageIndex(cii);
+    // If we were editing a caption, end the edit before we switch images.
+    if (ui->editCaptionAct->isChecked())
+    {
+        endCaptionEdit();
+        ui->editCaptionAct->setChecked(false);
+    }
 
-    // If we have a valid indedx, display the image
-    if (m_core.currentImageIndex() >= 0)
+    // Set the index, no matter what it is, then check to see if we get a
+    // valid file name for the index
+    m_core.setCurrentImageIndex(cii);
+    auto fileNameInDir = m_core.currentFileName();
+    if (fileNameInDir.isEmpty())
+    {
+        // No image to display
+        //
+        // Disable the "edit caption" action
+        ui->editCaptionAct->setEnabled(false);
+    }
+    else
     {
 
-        // Get the file name and its full path
-        auto fileNameInDir = m_core.currentImageFileNameList()[
-                m_core.currentImageIndex()];
+        // Get the full path
         auto imageFileName =
                 QDir(m_core.currentFolderPath()).filePath(fileNameInDir);
 
-        ui->textLbl->setText(m_core.captionFor(fileNameInDir));
+        ui->textEdt->setText(m_core.captionFor(fileNameInDir));
 
         // Read the image from the file
         QImageReader reader(imageFileName);
@@ -92,16 +111,21 @@ void MainWindow::setCurrentImageIndex(int cii)
         if (pixmap.size().width() > pixmap.size().height())
         {
             newLayout = new QVBoxLayout;
-            ui->textLbl->setMaximumWidth(QWIDGETSIZE_MAX);
+            ui->textEdt->setMaximumWidth(QWIDGETSIZE_MAX);
         }
         else
         {
             newLayout = new QHBoxLayout;
-            ui->textLbl->setMaximumWidth(this->size().width() / 3);
+            ui->textEdt->setMaximumWidth(this->size().width() / 3);
         }
 
         newLayout->addWidget(ui->imageScrl);
-        newLayout->addWidget(ui->textLbl);
+        newLayout->addWidget(ui->textEdt);
+
+        // If there's no text to show, hide the label
+        if (ui->textEdt->toPlainText().isEmpty())
+            ui->textEdt->hide();
+        else ui->textEdt->show();
 
         delete ui->centralWidget->layout();
         ui->centralWidget->setLayout(newLayout);
@@ -125,6 +149,36 @@ void MainWindow::setCurrentImageIndex(int cii)
 
         qDebug() << "loaded image file " << imageFileName;
 
-    }   // end if we have a valid current index
+        // Make sure the "edit caption" action is now enabled
+        ui->editCaptionAct->setEnabled(true);
+
+    }   // end if we have a valid current index (image to display)
 
 }   //  end setCurrentImageIndex method
+
+void MainWindow::beginCaptionEdit(void)
+{
+    ui->textEdt->show();
+    ui->textEdt->setReadOnly(false);
+}   // end beginCaptionEdit method
+
+void MainWindow::endCaptionEdit(void)
+{
+
+    ui->textEdt->setReadOnly(true);
+
+    auto cfn = m_core.currentFileName();
+
+    if (ui->textEdt->toPlainText().isEmpty())
+    {
+        // No caption - make sure it is erased
+        m_core.eraseCaptionFor(cfn);
+        ui->textEdt->hide();
+    }
+    else
+    {
+        // We have a caption - make sure it is recorded.
+        m_core.setCaptionFor(cfn, ui->textEdt->toHtml());
+    }
+
+}   // end endCaptionEdit method
