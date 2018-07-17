@@ -107,7 +107,8 @@ class Core
      *
      * @param fileName The name of the file
      *
-     * @return The caption for the file
+     * @return The caption for the file, or an empty string if there is no
+     * caption for the file
      */
     QString captionFor(const QString& fileName) const;
 

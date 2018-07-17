@@ -127,11 +127,39 @@ class ApplicationWindow : public QObject
      * @return The full URL of the current file, or an empty string if there
      * is no current file
      */
-    QString currentFileNameUrl(void)
+    QString currentFileNameUrl(void) const
     {
         auto fn = currentFileName();
         if (fn.isEmpty()) return QString();
         else return currentFolderUrl() + "/" + fn;
+    }
+
+    // The caption for the current image
+    Q_PROPERTY(
+            QString currentCaption
+            READ currentCaption
+            WRITE setCurrentCaption)
+
+    /**
+     * @brief Retrieve the caption for the current image file
+     *
+     * @return The current caption for the file, or an empty string if there is
+     * no caption for the file
+     */
+    QString currentCaption(void) const
+    {
+        return m_core.captionFor(currentFileName());
+    }   // end currentCaption
+
+    /**
+     * @brief Set the caption the current file name, saving it to metadata
+     * straight away
+     *
+     * @param ct The caption text to set
+     */
+    void setCurrentCaption(QString ct)
+    {
+        m_core.setCaptionFor(currentFileName(), std::move(ct));
     }
 
     /**
@@ -145,6 +173,26 @@ class ApplicationWindow : public QObject
      * @param message The human-readable error message
      */
     Q_INVOKABLE void signalError(QString action, QString message);
+
+    /**
+     * @brief Display a message box in the main window
+     *
+     * This method simply emits the `messageBox` signal.
+     *
+     * @param mbHeading The heading string
+     *
+     * @param mbText The text string
+     *
+     * @param iconCode The code for the icon to use (same as the
+     * QMessageBox::Icon enum values)
+     */
+    Q_INVOKABLE void showMessageBox(
+            QString mbHeading,
+            QString mbText,
+            int iconCode)
+    {
+        emit messageBox(mbHeading, mbText, iconCode);
+    }   // end showMessageBox method
 
     // -- Utilities --
 
@@ -160,7 +208,10 @@ class ApplicationWindow : public QObject
      * @param iconCode The code for the icon to use (same as the
      * QMessageBox::Icon enum values)
      */
-    void messageBox(QString mbHeading, QString mbText, int iconCode = 0);
+    void messageBox(
+            QString mbHeading,
+            QString mbText,
+            int iconCode = 0);
 
     /**
      * @brief Load and display a given image in the Main Window

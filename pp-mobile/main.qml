@@ -85,6 +85,9 @@ ApplicationWindow {
                         console.log("tall image (portrait)")
                     }
 
+                    textEdt.text = mainWindow.currentCaption
+                    console.log("text is: " + mainWindow.currentCaption)
+
                 }   // end onStatusChanged handler
 
             }   // end onStatusChanged event handler
@@ -97,12 +100,15 @@ ApplicationWindow {
             id: textEdt
             text: "[text]"
             readOnly: true
+            color: "blue"
 
             // Layout.row: 0
             // Layout.column: 1
+            // Layout.minimumHeight: 50
 
             // Put the caption text at the bottom of the grid
             function setBottom() {
+
                 Layout.row = 1
                 Layout.column = 0
                 Layout.minimumWidth = -1
@@ -112,6 +118,7 @@ ApplicationWindow {
 
             // Put the caption text on the side of the grid
             function setSide() {
+
                 Layout.row = 0
                 Layout.column = 1
                 Layout.minimumWidth = parent.width / 3
@@ -120,6 +127,7 @@ ApplicationWindow {
             }
 
         }   // end rightText
+
 
     }   // end mainGrid
 
@@ -145,10 +153,28 @@ ApplicationWindow {
                 text: "Edit Caption"
                 checkable: true
                 onClicked: {
-                    mainWindow.signalError(
-                                "Edit Caption",
-                                "Capability not implemented yet");
+
+                    if (editBtn.checked) {
+                        console.log("entering edit mode")
+
+                        // Make edit box editable
+                        textEdt.readOnly = false
+                        if (textEdt.text === "") {
+                            textEdt.text = "[placeholder]"
+                        }
+                        textEdt.cursorVisible = true
+                    }
+                    else {
+                        console.log("exiting edit mode")
+                        console.log("text is: " + textEdt.text)
+
+                        mainWindow.currentCaption = textEdt.text
+                        textEdt.readOnly = true
+                        textEdt.cursorVisible = false
+                    }
+
                 }   // end onClicked method
+
             }   // end editBtn
 
         }   // end RowLayout
