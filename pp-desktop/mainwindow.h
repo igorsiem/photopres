@@ -69,11 +69,28 @@ class MainWindow : public QMainWindow
      */
     void on_openFolderAct_triggered(void);
 
+    /**
+     * @brief Begins or ends caption editing
+     *
+     * When not editing, this method makes the caption edit box writeable, so
+     * that caption text can be entered / edited. If we are already editing,
+     * this method records the updated caption
+     */
     void on_editCaptionAct_triggered(void);
+
+    /**
+     * @brief View the next image in the current folder
+     */
+    void on_previousImageAct_triggered();
+
+    /**
+     * @brief View the previous image in the current folder
+     */
+    void on_nextImageAct_triggered();
 
     // --- Internal Declarations ---
 
-    private:
+private:
 
     // -- Internal Helper Methods --
 
@@ -92,8 +109,21 @@ class MainWindow : public QMainWindow
      */
     void setCurrentImageIndex(int cii);
 
+    /**
+     * @brief Begin editing operation on caption
+     *
+     * This method method makes sure the caption edit box is visible and
+     * editable (not read-only).
+     */
     void beginCaptionEdit(void);
 
+    /**
+     * @brief Finish editing operation on caption
+     *
+     * This method saves updates to a caption (including deleting the caption if
+     * it is empty), and then sets the edit box to read-only for ordinary
+     * viewing.
+     */
     void endCaptionEdit(void);
 
     // -- Attributes --

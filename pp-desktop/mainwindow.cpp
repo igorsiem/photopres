@@ -69,6 +69,30 @@ void MainWindow::on_editCaptionAct_triggered(void)
     else endCaptionEdit();
 }   // end on_editCaptionAct_triggered
 
+void MainWindow::on_previousImageAct_triggered()
+{
+    // If we're in caption-edit mode, save the changes.
+    if (ui->editCaptionAct->isChecked())
+    {
+        endCaptionEdit();
+        ui->editCaptionAct->setChecked(false);
+    }
+
+    setCurrentImageIndex(m_core.currentImageIndex()-1);
+}   // end on_previousImageAct_triggered
+
+void MainWindow::on_nextImageAct_triggered()
+{
+    // If we're in caption-edit mode, save the changes.
+    if (ui->editCaptionAct->isChecked())
+    {
+        endCaptionEdit();
+        ui->editCaptionAct->setChecked(false);
+    }
+
+    setCurrentImageIndex(m_core.currentImageIndex()+1);
+}   // end on_nextImageAct_triggered
+
 void MainWindow::setCurrentImageIndex(int cii)
 {
 
@@ -154,12 +178,23 @@ void MainWindow::setCurrentImageIndex(int cii)
 
     }   // end if we have a valid current index (image to display)
 
+    // Enable / disable our 'previous' / 'next' actions accordingly.
+    if (m_core.currentImageIndex() > 0) ui->previousImageAct->setEnabled(true);
+    else ui->previousImageAct->setEnabled(false);
+
+    if (m_core.currentImageIndex() < m_core.currentImageFileNameList().size()-1)
+        ui->nextImageAct->setEnabled(true);
+    else ui->nextImageAct->setEnabled(false);
+
+
 }   //  end setCurrentImageIndex method
 
 void MainWindow::beginCaptionEdit(void)
 {
     ui->textEdt->show();
     ui->textEdt->setReadOnly(false);
+
+    qDebug() << "beginning edit caption";
 }   // end beginCaptionEdit method
 
 void MainWindow::endCaptionEdit(void)
@@ -174,11 +209,15 @@ void MainWindow::endCaptionEdit(void)
         // No caption - make sure it is erased
         m_core.eraseCaptionFor(cfn);
         ui->textEdt->hide();
+
+        qDebug() << "finished editing caption - empty caption";
     }
     else
     {
         // We have a caption - make sure it is recorded.
         m_core.setCaptionFor(cfn, ui->textEdt->toHtml());
+
+        qDebug() << "finished editing caption - " << ui->textEdt->toPlainText();
     }
 
 }   // end endCaptionEdit method
