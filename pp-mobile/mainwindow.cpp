@@ -1,12 +1,12 @@
 #include <QString>
 #include <QTextStream>
 
-#include "ppcore.h"
+#include "mainwindow.h"
 
 #define PPM_TOP_LEVEL_TRY try
 
 // Macro for catching exceptions and signalling to the User - this should ONLY
-// be used using the PpCore class
+// be used in the ApplicationWindow class
 #define PPM_TOP_LEVEL_CATCH( action ) \
     catch (const PhotoPres::Error& err) \
     { \
@@ -40,26 +40,30 @@
                 "encountered")); \
     }
 
-PpCore::PpCore(QObject *parent) : QObject(parent)
+ApplicationWindow::ApplicationWindow(QObject *parent) :
+    QObject(parent),
+    m_settings("Igor Siemienowicz", "PhotoPres"),
+    m_core(m_settings)
 {
 }   // end constructor
 
-QString PpCore::version(void) const
+QString ApplicationWindow::version(void) const
 {
     return QString::fromStdString(PhotoPres::Core::version());
 }   // end version method
 
-// TODO Temporary demo code - delete
-void PpCore::makeAnError(void)
+void ApplicationWindow::setCurrentImageIndex(int cii)
 {
     PPM_TOP_LEVEL_TRY
     {
-        PP_RAISE_ERROR("This is Igor's error!");
+        m_core.setCurrentImageIndex(cii);
+        auto imageFileUrl = currentFileNameUrl();
+        if (!imageFileUrl.isEmpty()) emit displayImage(imageFileUrl);
     }
-    PPM_TOP_LEVEL_CATCH("Test Error");
-}
+    PPM_TOP_LEVEL_CATCH("Loading and Displaying an Image")
+}   // end setCurrentImageIndex method
 
-void PpCore::signalError(QString action, QString message)
+void ApplicationWindow::signalError(QString action, QString message)
 {
     // icon code is for critical error
     emit messageBox(action, message, 3);
