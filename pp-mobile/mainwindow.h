@@ -105,6 +105,33 @@ class ApplicationWindow : public QObject
      */
     void setCurrentImageIndex(int cii);
 
+    // The total number of image files in the current folder
+    Q_PROPERTY(int imagesCount READ imagesCount)
+
+    /**
+     * @brief Retrieve the total number of image files in the current folder
+     *
+     * @return The total count of image files in the current folder
+     */
+    int imagesCount(void) const
+        { return m_core.currentImageFileNameList().size(); }
+
+    /**
+     * @brief Move to the previous image in the folder
+     */
+    Q_INVOKABLE void previousImage(void)
+    {
+        setCurrentImageIndex(currentImageIndex()-1);
+    }
+
+    /**
+     * @brief Move to the next image in the folder
+     */
+    Q_INVOKABLE void nextImage(void)
+    {
+        setCurrentImageIndex(currentImageIndex()+1);
+    }
+
     // The current file name, indicated by the current image index
     Q_PROPERTY(QString currentFileName READ currentFileName)
 

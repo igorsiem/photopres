@@ -35,6 +35,14 @@ ApplicationWindow {
         // Implement the `displayImage` signal
         onDisplayImage: {
             image.source = path
+
+            if (mainWindow.currentImageIndex <= 0)
+                previousImageBtn.enabled = false
+            else previousImageBtn.enabled = true
+
+            if (mainWindow.currentImageIndex >= mainWindow.imagesCount-1)
+                nextImageBtn.enabled = false
+            else nextImageBtn.enabled = true
         }
 
     }   // end mainWindow
@@ -176,6 +184,62 @@ ApplicationWindow {
                 }   // end onClicked method
 
             }   // end editBtn
+
+            // The "previous image" button
+            ToolButton {
+
+                id: previousImageBtn
+                text: "Previous Image"
+
+                // Move to the previous image
+                onClicked: {
+
+                    // If we are in editing mode, save the edits first.
+                    if (editBtn.checked) {
+                        console.log("exiting edit mode")
+                        console.log("text is: " + textEdt.text)
+
+                        mainWindow.currentCaption = textEdt.text
+                        textEdt.readOnly = true
+                        textEdt.cursorVisible = false
+
+                        editBtn.checked = false
+                    }
+
+                    mainWindow.currentImageIndex =
+                            mainWindow.currentImageIndex - 1
+
+                }   // end onClicked event handler
+
+            }   // end previousImageBtn
+
+            // The "next image" buton
+            ToolButton {
+
+                id: nextImageBtn
+                text: "Next Image"
+
+                // Move to the next image
+                onClicked: {
+
+                    // If we are in editing mode, save the edits first.
+                    if (editBtn.checked) {
+                        console.log("exiting edit mode")
+                        console.log("text is: " + textEdt.text)
+
+                        mainWindow.currentCaption = textEdt.text
+                        textEdt.readOnly = true
+                        textEdt.cursorVisible = false
+
+                        editBtn.checked = false
+                    }
+
+                    mainWindow.currentImageIndex =
+                            mainWindow.currentImageIndex + 1
+
+                }   // end onClicked event handler
+
+            }   // end previousImageBtn
 
         }   // end RowLayout
 
