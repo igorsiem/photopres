@@ -1,0 +1,18 @@
+# Simple rakeflle to convert the SVGs into PNGs that the mobile app can use
+
+Dir.glob("*.svg") do |fn|
+    bn = File.basename(fn, ".*")
+
+    svg_nm = File.basename(fn)
+    png_nm = bn + ".png"
+
+    file png_nm => svg_nm do
+        # puts "convert #{svg_nm} => #{png_nm}"
+        sh "inkscape -z -e #{png_nm} -w 32 #{svg_nm}"
+    end
+
+    task :default => png_nm
+
+    # puts "converting #{svg_nm} => #{png_nm}... "
+    # puts "done"
+end
