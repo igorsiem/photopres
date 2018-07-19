@@ -1,0 +1,8 @@
+<RCC>
+    <qresource>
+        <file>../shared-resources/icons/back-arrow.svg</file>
+        <file>../shared-resources/icons/folder.svg</file>
+        <file>../shared-resources/icons/forward-arrow.svg</file>
+        <file>../shared-resources/icons/pencil.svg</file>
+    </qresource>
+</RCC>

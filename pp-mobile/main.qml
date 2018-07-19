@@ -1,5 +1,5 @@
 import QtQuick 2.9
-import QtQuick.Controls 2.1
+import QtQuick.Controls 2.3
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.2
@@ -37,12 +37,12 @@ ApplicationWindow {
             image.source = path
 
             if (mainWindow.currentImageIndex <= 0)
-                previousImageBtn.enabled = false
-            else previousImageBtn.enabled = true
+                previousImageAct.enabled = false
+            else previousImageAct.enabled = true
 
             if (mainWindow.currentImageIndex >= mainWindow.imagesCount-1)
-                nextImageBtn.enabled = false
-            else nextImageBtn.enabled = true
+                nextImageAct.enabled = false
+            else nextImageAct.enabled = true
         }
 
     }   // end mainWindow
@@ -110,8 +110,8 @@ ApplicationWindow {
             readOnly: true
             color: "blue"
 
-            // Layout.row: 0
-            // Layout.column: 1
+            Layout.row: 0
+            Layout.column: 1
             // Layout.minimumHeight: 50
 
             // Put the caption text at the bottom of the grid
@@ -136,8 +136,82 @@ ApplicationWindow {
 
         }   // end rightText
 
-
     }   // end mainGrid
+
+    // Action to Open / Set the active folder
+    Action {
+        id: openAct
+        text: "Open"
+        icon.source: "qrc:/folder"
+
+        onTriggered: {
+            folderChooser.folder = mainWindow.currentFolderUrl
+            folderChooser.open()
+        }
+    }   // end openAction
+
+    /**
+     * @brief Finish editing, saving the updated caption and un-checking the
+     * `editAct` action.
+     */
+    function closeEditing() {
+        console.log("exiting edit mode")
+        console.log("text is: " + textEdt.text)
+
+        mainWindow.currentCaption = textEdt.text
+        textEdt.readOnly = true
+        textEdt.cursorVisible = false
+
+        editAct.checked = false
+    }
+
+    // Action to  start or finish caption editing
+    Action {
+        id: editAct
+        text: "Edit Caption"
+        checkable: true
+        icon.source: "qrc:/pencil"
+
+        onTriggered: {
+            if (editAct.checked) {
+                console.log("entering edit mode")
+
+                // Make edit box editable
+                textEdt.readOnly = false
+                if (textEdt.text === "") {
+                    textEdt.text = "[placeholder]"
+                }
+                textEdt.cursorVisible = true
+            }
+            else closeEditing()
+        }
+    }
+
+    Action {
+        id: previousImageAct
+        text: "Previous Image"
+        icon.source: "qrc:/back-arrow"
+
+        onTriggered: {
+            if (editAct.checked) closeEditing()
+            mainWindow.currentImageIndex =
+                    mainWindow.currentImageIndex - 1
+        }
+    }   // end previousImageAct
+
+    Action {
+        id: nextImageAct
+        text: "Next Image"
+        icon.source: "qrc:/forward-arrow"
+
+        onTriggered: {
+            // If we are in editing mode, save the edits first.
+            if (editAct.checked) closeEditing()
+
+            mainWindow.currentImageIndex =
+                    mainWindow.currentImageIndex + 1
+        }
+    }   // end nextImageAct
 
     // The tool bar on the footer of the Main Window
     footer: ToolBar {
@@ -148,97 +222,25 @@ ApplicationWindow {
             // Choose a folder of images
             ToolButton {
                 id: openBtn
-                text: "Open"           
-                onClicked: {
-                    folderChooser.folder = mainWindow.currentFolderUrl
-                    folderChooser.open()
-                }
+                action: openAct
             }   // end openBtn
 
             // Edit the caption for the current image
             ToolButton {
                 id: editBtn
-                text: "Edit Caption"
-                checkable: true
-                onClicked: {
-
-                    if (editBtn.checked) {
-                        console.log("entering edit mode")
-
-                        // Make edit box editable
-                        textEdt.readOnly = false
-                        if (textEdt.text === "") {
-                            textEdt.text = "[placeholder]"
-                        }
-                        textEdt.cursorVisible = true
-                    }
-                    else {
-                        console.log("exiting edit mode")
-                        console.log("text is: " + textEdt.text)
-
-                        mainWindow.currentCaption = textEdt.text
-                        textEdt.readOnly = true
-                        textEdt.cursorVisible = false
-                    }
-
-                }   // end onClicked method
-
+                action: editAct
             }   // end editBtn
 
             // The "previous image" button
             ToolButton {
-
                 id: previousImageBtn
-                text: "Previous Image"
-
-                // Move to the previous image
-                onClicked: {
-
-                    // If we are in editing mode, save the edits first.
-                    if (editBtn.checked) {
-                        console.log("exiting edit mode")
-                        console.log("text is: " + textEdt.text)
-
-                        mainWindow.currentCaption = textEdt.text
-                        textEdt.readOnly = true
-                        textEdt.cursorVisible = false
-
-                        editBtn.checked = false
-                    }
-
-                    mainWindow.currentImageIndex =
-                            mainWindow.currentImageIndex - 1
-
-                }   // end onClicked event handler
-
+                action: previousImageAct
             }   // end previousImageBtn
 
             // The "next image" buton
             ToolButton {
-
                 id: nextImageBtn
-                text: "Next Image"
-
-                // Move to the next image
-                onClicked: {
-
-                    // If we are in editing mode, save the edits first.
-                    if (editBtn.checked) {
-                        console.log("exiting edit mode")
-                        console.log("text is: " + textEdt.text)
-
-                        mainWindow.currentCaption = textEdt.text
-                        textEdt.readOnly = true
-                        textEdt.cursorVisible = false
-
-                        editBtn.checked = false
-                    }
-
-                    mainWindow.currentImageIndex =
-                            mainWindow.currentImageIndex + 1
-
-                }   // end onClicked event handler
-
+                action: nextImageAct
             }   // end previousImageBtn
 
         }   // end RowLayout

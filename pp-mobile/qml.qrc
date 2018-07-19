@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file alias="back-arrow">../shared-resources/icons/back-arrow.png</file>
+        <file alias="folder">../shared-resources/icons/folder.png</file>
+        <file alias="forward-arrow">../shared-resources/icons/forward-arrow.png</file>
+        <file alias="pencil">../shared-resources/icons/pencil.png</file>
     </qresource>
 </RCC>
