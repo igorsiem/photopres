@@ -14,19 +14,34 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_settings("Igor Siemienowicz", "PhotoPres"),
-    m_core(m_settings)
+    m_core(m_settings),
+    m_imageLbl(nullptr)
 {
     ui->setupUi(this);
+
+    // Manual creation of image label and various bits of configuration
+    m_imageLbl = new ClickableLabel();
+    m_imageLbl->setText("<image>");
+    m_imageLbl->setBackgroundRole(QPalette::Dark);
+
+    // Connect the click of the image label to a lambda that invokes the
+    // previous or next action, depending on whether we clicked in the left or
+    // the right.
+    connect(m_imageLbl, &ClickableLabel::clicked, [this](int x, int) {
+        if (x < (m_imageLbl->width() / 2)) on_previousImageAct_triggered();
+        else on_nextImageAct_triggered();
+    });
+
+    ui->imageScrl->setWidget(m_imageLbl);
+    ui->imageScrl->setBackgroundRole(QPalette::Dark);
+
+    // m_imageLbl->setBackgroundRole(QPalette::Dark);
 
     // Retrieve window geometry and state from persistent settings storage
     m_settings.beginGroup("MainWindow");
     restoreGeometry(m_settings.value("geometry").toByteArray());
     restoreState(m_settings.value("state").toByteArray());
     m_settings.endGroup();
-
-    // Set some of the image / scrolling area stuff manually
-    ui->imageScrl->setBackgroundRole(QPalette::Dark);
-    ui->imageLbl->setBackgroundRole(QPalette::Dark);
 
 }   // end constructor
 
@@ -159,17 +174,17 @@ void MainWindow::setCurrentImageIndex(int cii)
         newLayout->activate();
 
         // Put the image pixmap into the image label
-        ui->imageLbl->resize(ui->imageScrl->size());
+        m_imageLbl->resize(ui->imageScrl->size());
 
-        ui->imageLbl->setPixmap(
+        m_imageLbl->setPixmap(
                     pixmap.scaled(
-                        ui->imageLbl->width(),
-                        ui->imageLbl->height(),
+                        m_imageLbl->width(),
+                        m_imageLbl->height(),
                         Qt::KeepAspectRatio,
                         Qt::SmoothTransformation)
                    );
 
-        // ui->imageLbl->adjustSize();
+        // m_imageLbl->adjustSize();
 
         qDebug() << "loaded image file " << imageFileName;
 

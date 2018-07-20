@@ -8,6 +8,8 @@
 
 #include <core.h>
 
+#include "clickablelabel.h"
+
 /**
  * \brief User Interface elements
  */
@@ -143,6 +145,8 @@ private:
      * @brief PhotoPres core library functionality
      */
     PhotoPres::Core m_core;
+
+    ClickableLabel* m_imageLbl;
 
 };  // end MainWindow class
 
