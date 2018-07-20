@@ -1,6 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.3
 import QtQuick.Dialogs 1.2
+import Qt.labs.handlers 1.0
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.2
 
@@ -99,6 +100,22 @@ ApplicationWindow {
                 }   // end onStatusChanged handler
 
             }   // end onStatusChanged event handler
+
+            // Handle taps on the left side or right side of the image to go to
+            // the previous or next image
+            TapHandler {
+                onTapped: {
+                    // console.log("tapped " + point.position.x)
+                    if (point.position.x < image.width / 2) {
+                        console.log("left-side tap - previous image")
+                        previousImageAct.trigger()
+                    }
+                    else {
+                        console.log("right-side tap - next image")
+                        nextImageAct.trigger()
+                    }
+                }
+            }   // end TapHandler
 
         }   // end image
 
