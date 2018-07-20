@@ -25,11 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    clickablelabel.cpp
 
 HEADERS += \
         mainwindow.h \
-    errorhandling.h
+    errorhandling.h \
+    clickablelabel.h
 
 FORMS += \
         mainwindow.ui
