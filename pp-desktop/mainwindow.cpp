@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_filesModel->setParent(this);  // <-- delete when parent is deleted
     m_filesModel->setFilter(QDir::NoDotAndDotDot
                             | QDir::Files);
+    m_filesModel->setNameFilters(QStringList({"*.jpg"}));
+    m_filesModel->setNameFilterDisables(false);
     m_filesModel->setIconProvider(new ThumbnailIconProvider());
     ui->filesLvw->setModel(m_filesModel);
 
@@ -231,8 +233,6 @@ void MainWindow::setCurrentImageIndex(int cii)
 
         // m_imageLbl->adjustSize();
 
-        qDebug() << "loaded image file " << imageFileName;
-
         // Make sure the "edit caption" action is now enabled
         ui->editCaptionAct->setEnabled(true);
 
@@ -243,9 +243,9 @@ void MainWindow::setCurrentImageIndex(int cii)
                         m_core.currentFileName()));
         ui->filesLvw->setCurrentIndex(imageIndex);
 
-        qDebug() << "set image index selection to (" << imageIndex.row() <<
-                    "," << imageIndex.column() << ") - " <<
-                    imageIndex.isValid();
+        qDebug() << "loaded image file " << imageFileName << " (item " << cii <<
+                    ") in image sequence";
+
 
     }   // end if we have a valid current index (image to display)
 

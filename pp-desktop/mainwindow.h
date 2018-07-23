@@ -89,6 +89,12 @@ class MainWindow : public QMainWindow
 
     // --- Internal Declarations ---
 
+    /**
+     * @brief Select a file when it is clicked in the list view
+     *
+     * @param index The index object; the row of this is assumed to be the index
+     * of the image
+     */
     void on_filesLvw_clicked(const QModelIndex &index);
 
 private:
