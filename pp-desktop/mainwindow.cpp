@@ -1,7 +1,10 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QImageReader>
+#include <QItemSelectionModel>
 #include <QLayout>
+#include <QList>
+#include <QModelIndex>
 #include <QPixmap>
 #include <QVBoxLayout>
 
@@ -9,13 +12,15 @@
 #include "ui_mainwindow.h"
 
 #include "errorhandling.h"
+#include "thumbnailiconprovider.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_settings("Igor Siemienowicz", "PhotoPres"),
     m_core(m_settings),
-    m_imageLbl(nullptr)
+    m_imageLbl(nullptr),
+    m_filesModel(new QFileSystemModel)
 {
     ui->setupUi(this);
 
@@ -23,6 +28,18 @@ MainWindow::MainWindow(QWidget *parent) :
     m_imageLbl = new ClickableLabel();
     m_imageLbl->setText("<image>");
     m_imageLbl->setBackgroundRole(QPalette::Dark);
+
+    // Set up the file system model for the images list view
+    m_filesModel->setParent(this);  // <-- delete when parent is deleted
+    m_filesModel->setFilter(QDir::NoDotAndDotDot
+                            | QDir::Files);
+    m_filesModel->setIconProvider(new ThumbnailIconProvider());
+    ui->filesLvw->setModel(m_filesModel);
+
+    // TODO get split geometry from persistent settings, and use these widths
+    // for defaults.
+    ui->centralSpl->setSizes(
+        QList<int>({ 200, 600 }));
 
     // Connect the click of the image label to a lambda that invokes the
     // previous or next action, depending on whether we clicked in the left or
@@ -60,6 +77,17 @@ void MainWindow::closeEvent(QCloseEvent* event)
     QMainWindow::closeEvent(event);
 }   // end closeEvent method
 
+void MainWindow::showEvent(QShowEvent* event)
+{
+    QMainWindow::showEvent(event);
+
+    // Set the image to zero, and notify the file list view and model of
+    // the current directory.
+    setCurrentImageIndex(0);
+    ui->filesLvw->setRootIndex(
+                m_filesModel->setRootPath(m_core.currentFolderPath()));
+}   // end showEvent method
+
 void MainWindow::on_openFolderAct_triggered()
 {
     PPD_TOP_LEVEL_TRY
@@ -70,8 +98,13 @@ void MainWindow::on_openFolderAct_triggered()
                     m_core.currentFolderPath());
         if (!dir.isEmpty())
         {
-            m_core.setCurrentFolderPath(dir);
+            m_core.setCurrentFolderPath(dir);            
             setCurrentImageIndex(0);
+
+            // Set the root of the file model and view to the new dir
+            ui->filesLvw->setRootIndex(m_filesModel->setRootPath(dir));
+
+            qDebug() << "set file model root to " << dir;
         }
 
     }
@@ -107,6 +140,18 @@ void MainWindow::on_nextImageAct_triggered()
 
     setCurrentImageIndex(m_core.currentImageIndex()+1);
 }   // end on_nextImageAct_triggered
+
+void MainWindow::on_filesLvw_clicked(const QModelIndex &index)
+{
+    // If we're in caption-edit mode, save the changes.
+    if (ui->editCaptionAct->isChecked())
+    {
+        endCaptionEdit();
+        ui->editCaptionAct->setChecked(false);
+    }
+
+    setCurrentImageIndex(index.row());
+}   // end on_filesLvw_clicked method
 
 void MainWindow::setCurrentImageIndex(int cii)
 {
@@ -166,8 +211,8 @@ void MainWindow::setCurrentImageIndex(int cii)
             ui->textEdt->hide();
         else ui->textEdt->show();
 
-        delete ui->centralWidget->layout();
-        ui->centralWidget->setLayout(newLayout);
+        delete ui->contentWdg->layout();
+        ui->contentWdg->setLayout(newLayout);
 
         // We activate the layout at this point, so that the image is resized
         // correctly.
@@ -191,6 +236,17 @@ void MainWindow::setCurrentImageIndex(int cii)
         // Make sure the "edit caption" action is now enabled
         ui->editCaptionAct->setEnabled(true);
 
+        // Make sure the list view knows about the image selection change. The
+        // 'row' in the list is the image index.
+        QModelIndex imageIndex = m_filesModel->index(
+                    QDir(m_core.currentFolderPath()).filePath(
+                        m_core.currentFileName()));
+        ui->filesLvw->setCurrentIndex(imageIndex);
+
+        qDebug() << "set image index selection to (" << imageIndex.row() <<
+                    "," << imageIndex.column() << ") - " <<
+                    imageIndex.isValid();
+
     }   // end if we have a valid current index (image to display)
 
     // Enable / disable our 'previous' / 'next' actions accordingly.
@@ -200,7 +256,6 @@ void MainWindow::setCurrentImageIndex(int cii)
     if (m_core.currentImageIndex() < m_core.currentImageFileNameList().size()-1)
         ui->nextImageAct->setEnabled(true);
     else ui->nextImageAct->setEnabled(false);
-
 
 }   //  end setCurrentImageIndex method
 

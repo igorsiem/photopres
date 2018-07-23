@@ -1,6 +1,7 @@
 #ifndef ppdesktop_mainwindow_h_included
 #define ppdesktop_mainwindow_h_included
 
+#include <QFileSystemModel>
 #include <QLabel>
 #include <QMainWindow>
 #include <QSettings>
@@ -54,11 +55,7 @@ class MainWindow : public QMainWindow
      * @param event The 'Show Event' (passed on to the base class
      * implementation)
      */
-    virtual void showEvent(QShowEvent* event) override
-    {
-        QMainWindow::showEvent(event);
-        setCurrentImageIndex(0);
-    }
+    virtual void showEvent(QShowEvent* event) override;
 
     private slots:
 
@@ -91,6 +88,8 @@ class MainWindow : public QMainWindow
     void on_nextImageAct_triggered();
 
     // --- Internal Declarations ---
+
+    void on_filesLvw_clicked(const QModelIndex &index);
 
 private:
 
@@ -146,7 +145,12 @@ private:
      */
     PhotoPres::Core m_core;
 
+    /**
+     * @brief The label that displays the current image
+     */
     ClickableLabel* m_imageLbl;
+
+    QFileSystemModel* m_filesModel;
 
 };  // end MainWindow class
 
