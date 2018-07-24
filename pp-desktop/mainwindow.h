@@ -1,7 +1,6 @@
 #ifndef ppdesktop_mainwindow_h_included
 #define ppdesktop_mainwindow_h_included
 
-#include <QFileSystemModel>
 #include <QLabel>
 #include <QMainWindow>
 #include <QSettings>
@@ -10,6 +9,7 @@
 #include <core.h>
 
 #include "clickablelabel.h"
+#include "coreimagemodel.h"
 
 /**
  * \brief User Interface elements
@@ -95,7 +95,7 @@ class MainWindow : public QMainWindow
      * @param index The index object; the row of this is assumed to be the index
      * of the image
      */
-    void on_filesLvw_clicked(const QModelIndex &index);
+    void on_imagesLvw_clicked(const QModelIndex &index);
 
 private:
 
@@ -156,7 +156,11 @@ private:
      */
     ClickableLabel* m_imageLbl;
 
-    QFileSystemModel* m_filesModel;
+    /**
+     * @brief The data model for the Files list view
+     */
+    // QFileSystemModel* m_filesModel;
+    CoreImageModel* m_imagesModel;
 
 };  // end MainWindow class
 

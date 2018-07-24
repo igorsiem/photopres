@@ -2,6 +2,7 @@
 #define ppcore_core_h_included
 
 #include <string>
+#include <functional>
 
 #include <QSettings>
 #include <QString>
@@ -27,16 +28,21 @@ class Core
     public:
 
     /**
+     * @brief A callable object for signalling that the folder path has changed
+     */
+    using FolderPathChangedSignallerFn = std::function<void(const QString&)>;
+
+    /**
+     * @brief A callable object for signalling that the image index has changed
+     */
+    using ImageIndexChangedSignallerFn = std::function<void(int i)>;
+
+    /**
      * @brief Construct a Core library object
      *
      * @param settings Persistent settings object for the application
      */
-    explicit Core(QSettings& settings) :
-        m_settings(settings),
-        m_currentImageFileNameList(nullptr),
-        m_metadata(nullptr),
-        m_currentImageIndex(0)
-    {}
+    explicit Core(QSettings& settings);
 
     /**
      * @brief Retrieve the version of the core library, as a std::string
@@ -132,6 +138,24 @@ class Core
      */
     void eraseCaptionFor(const QString& fileName);
 
+    /**
+     * @brief Set the callable object used to signal that the folder path has
+     * changed
+     *
+     * @param fn The callable object ot invoke when the folder path changes
+     */
+    void signalFolderPathChangedUsing(FolderPathChangedSignallerFn fn)
+        { signalFolderPathChanged = std::move(fn); }
+
+    /**
+     * @brief Set the callable object used to signal that the image index has
+     * changed
+     *
+     * @param fn The callable object to invoke when the image index changed
+     */
+    void signalImageIndexChangedUsing(ImageIndexChangedSignallerFn fn)
+        { signalImageIndexChanged = std::move(fn); }
+
     protected:
 
     /**
@@ -183,6 +207,16 @@ class Core
      * in `m_currentImageFileNameList`, then it is set to -1.
      */
     int m_currentImageIndex;
+
+    /**
+     * @brief A callable object to invoke when the folder path has changed
+     */
+    FolderPathChangedSignallerFn signalFolderPathChanged;
+
+    /**
+     * @brief A callable object to invoke when the image index has changed
+     */
+    ImageIndexChangedSignallerFn signalImageIndexChanged;
 
 };  // end ppcore class
 

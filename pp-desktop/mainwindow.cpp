@@ -6,6 +6,7 @@
 #include <QList>
 #include <QModelIndex>
 #include <QPixmap>
+#include <QSortFilterProxyModel>
 #include <QVBoxLayout>
 
 #include "mainwindow.h"
@@ -20,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_settings("Igor Siemienowicz", "PhotoPres"),
     m_core(m_settings),
     m_imageLbl(nullptr),
-    m_filesModel(new QFileSystemModel)
+    m_imagesModel(nullptr)
 {
     ui->setupUi(this);
 
@@ -29,14 +30,11 @@ MainWindow::MainWindow(QWidget *parent) :
     m_imageLbl->setText("<image>");
     m_imageLbl->setBackgroundRole(QPalette::Dark);
 
-    // Set up the file system model for the images list view
-    m_filesModel->setParent(this);  // <-- delete when parent is deleted
-    m_filesModel->setFilter(QDir::NoDotAndDotDot
-                            | QDir::Files);
-    m_filesModel->setNameFilters(QStringList({"*.jpg"}));
-    m_filesModel->setNameFilterDisables(false);
-    m_filesModel->setIconProvider(new ThumbnailIconProvider());
-    ui->filesLvw->setModel(m_filesModel);
+    // Set up the data model for the image files
+    m_imagesModel = new CoreImageModel(m_core, this);
+    // m_filesModel->setIconProvider(new ThumbnailIconProvider());
+
+    ui->imagesLvw->setModel(m_imagesModel);
 
     // TODO get split geometry from persistent settings, and use these widths
     // for defaults.
@@ -53,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->imageScrl->setWidget(m_imageLbl);
     ui->imageScrl->setBackgroundRole(QPalette::Dark);
-
-    // m_imageLbl->setBackgroundRole(QPalette::Dark);
 
     // Retrieve window geometry and state from persistent settings storage
     m_settings.beginGroup("MainWindow");
@@ -83,11 +79,12 @@ void MainWindow::showEvent(QShowEvent* event)
 {
     QMainWindow::showEvent(event);
 
-    // Set the image to zero, and notify the file list view and model of
-    // the current directory.
+    // Set the image to zero, and notify the image list view
     setCurrentImageIndex(0);
-    ui->filesLvw->setRootIndex(
-                m_filesModel->setRootPath(m_core.currentFolderPath()));
+
+    ui->imagesLvw->selectionModel()->setCurrentIndex(
+                m_imagesModel->index(0, 0, QModelIndex()),
+                QItemSelectionModel::SelectCurrent);
 }   // end showEvent method
 
 void MainWindow::on_openFolderAct_triggered()
@@ -104,7 +101,7 @@ void MainWindow::on_openFolderAct_triggered()
             setCurrentImageIndex(0);
 
             // Set the root of the file model and view to the new dir
-            ui->filesLvw->setRootIndex(m_filesModel->setRootPath(dir));
+            // ui->filesLvw->setRootIndex(m_filesModel->setRootPath(dir));
 
             qDebug() << "set file model root to " << dir;
         }
@@ -143,8 +140,11 @@ void MainWindow::on_nextImageAct_triggered()
     setCurrentImageIndex(m_core.currentImageIndex()+1);
 }   // end on_nextImageAct_triggered
 
-void MainWindow::on_filesLvw_clicked(const QModelIndex &index)
+void MainWindow::on_imagesLvw_clicked(const QModelIndex &index)
 {
+
+    qDebug() << "clicked on item " << index.row();
+
     // If we're in caption-edit mode, save the changes.
     if (ui->editCaptionAct->isChecked())
     {
@@ -236,16 +236,8 @@ void MainWindow::setCurrentImageIndex(int cii)
         // Make sure the "edit caption" action is now enabled
         ui->editCaptionAct->setEnabled(true);
 
-        // Make sure the list view knows about the image selection change. The
-        // 'row' in the list is the image index.
-        QModelIndex imageIndex = m_filesModel->index(
-                    QDir(m_core.currentFolderPath()).filePath(
-                        m_core.currentFileName()));
-        ui->filesLvw->setCurrentIndex(imageIndex);
-
         qDebug() << "loaded image file " << imageFileName << " (item " << cii <<
                     ") in image sequence";
-
 
     }   // end if we have a valid current index (image to display)
 
@@ -256,6 +248,16 @@ void MainWindow::setCurrentImageIndex(int cii)
     if (m_core.currentImageIndex() < m_core.currentImageFileNameList().size()-1)
         ui->nextImageAct->setEnabled(true);
     else ui->nextImageAct->setEnabled(false);
+
+    // Make sure the list view knows about the image selection change. The
+    // 'row' in the list is the image index.
+    ui->imagesLvw->selectionModel()->setCurrentIndex(
+                m_imagesModel->index(
+                    m_core.currentImageIndex(),
+                    0,
+                    QModelIndex()),
+                QItemSelectionModel::SelectCurrent);
+
 
 }   //  end setCurrentImageIndex method
 

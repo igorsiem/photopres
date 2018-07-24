@@ -27,13 +27,13 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     clickablelabel.cpp \
-    thumbnailiconprovider.cpp
+    coreimagemodel.cpp
 
 HEADERS += \
         mainwindow.h \
     errorhandling.h \
     clickablelabel.h \
-    thumbnailiconprovider.h
+    coreimagemodel.h
 
 FORMS += \
         mainwindow.ui
