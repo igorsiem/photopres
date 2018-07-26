@@ -14,10 +14,116 @@ ApplicationWindow {
     height: 480
     title: qsTr("PhotoPres")
 
-    // After the main window loads, ask the user for a starting directory.
+    // --- Functionality ---
+
+    // After the main window loads, start a timer for the launch sequence. We
+    // can't actually *do* the launch sequence after the window has loaded,
+    // because Qt is, in fact, still doing some setup stuff internally.
+    //
+    // Instead, we invoke a zero-time timer which does the launch sequence when
+    // it  triggers. This probably works because the timer trigger is processed
+    // the event loop, which may not be running properly when `onCompleted` is
+    // called.
     Component.onCompleted: {
-        folderChooser.folder = mainWindow.currentFolderUrl
-        folderChooser.open()
+        launcher.start()
+    }
+
+    // Timer to run whatever things need to run at startup. In this iteration,
+    // this is just to open the Folder Chooser, but may run to other things in
+    // the future.
+    Timer {
+        id: launcher
+        triggeredOnStart: true
+        onTriggered: openAct.trigger()
+    }
+
+    // -- Actions --
+
+    // Action to Open / Set the active folder
+    Action {
+        id: openAct
+        text: "Open"
+        icon.source: "qrc:/folder"
+
+        onTriggered: {
+            folderChooser.folder = mainWindow.currentFolderUrl
+            folderChooser.open()
+        }
+    }   // end openAction
+
+    /**
+     * @brief Finish editing, saving the updated caption and un-checking the
+     * `editAct` action.
+     */
+    function closeEditing() {
+        console.log("exiting edit mode")
+        console.log("text is: " + textEdt.text)
+
+        mainWindow.currentCaption = textEdt.text
+        textEdt.readOnly = true
+        textEdt.cursorVisible = false
+
+        editAct.checked = false
+    }
+
+    // Action to  start or finish caption editing
+    Action {
+        id: editAct
+        text: "Edit Caption"
+        checkable: true
+        icon.source: "qrc:/pencil"
+
+        onTriggered: {
+            if (editAct.checked) {
+                console.log("entering edit mode")
+
+                // Make edit box editable
+                textEdt.readOnly = false
+                if (textEdt.text === "") {
+                    textEdt.text = "[placeholder]"
+                }
+                textEdt.cursorVisible = true
+            }
+            else closeEditing()
+        }
+    }
+
+    // Action to move to the previous image in the folder
+    Action {
+        id: previousImageAct
+        text: "Previous Image"
+        icon.source: "qrc:/back-arrow"
+
+        onTriggered: {
+            if (editAct.checked) closeEditing()
+            mainWindow.currentImageIndex =
+                    mainWindow.currentImageIndex - 1
+        }
+    }   // end previousImageAct
+
+    // Action to move to the next image in the folder
+    Action {
+        id: nextImageAct
+        text: "Next Image"
+        icon.source: "qrc:/forward-arrow"
+
+        onTriggered: {
+            // If we are in editing mode, save the edits first.
+            if (editAct.checked) closeEditing()
+
+            mainWindow.currentImageIndex =
+                    mainWindow.currentImageIndex + 1
+        }
+    }   // end nextImageAct
+
+    // Action to open the image drawer
+    Action {
+        id: openImagesDrawerAct
+        text: "Images"
+
+        onTriggered: {
+            imagesDrawer.open()
+        }
     }
 
     // The Main Window implementation object
@@ -47,6 +153,19 @@ ApplicationWindow {
         }
 
     }   // end mainWindow
+
+    // --- User Interface ---
+
+    // -- Main UI Elements --
+
+    header: ToolBar {
+        id: headerToolBar
+
+        ToolButton {
+            id: openImagesDrawerBtn
+            action: openImagesDrawerAct
+        }
+    }
 
     // Main layout of the application in a gird
     GridLayout {
@@ -155,80 +274,16 @@ ApplicationWindow {
 
     }   // end mainGrid
 
-    // Action to Open / Set the active folder
-    Action {
-        id: openAct
-        text: "Open"
-        icon.source: "qrc:/folder"
+    // Side-drawer for navigating images
+    Drawer {
+        id: imagesDrawer
+        width: 0.66 * parent.width
+        height: parent.height
 
-        onTriggered: {
-            folderChooser.folder = mainWindow.currentFolderUrl
-            folderChooser.open()
+        Label {
+            text: "Hello, there"
         }
-    }   // end openAction
-
-    /**
-     * @brief Finish editing, saving the updated caption and un-checking the
-     * `editAct` action.
-     */
-    function closeEditing() {
-        console.log("exiting edit mode")
-        console.log("text is: " + textEdt.text)
-
-        mainWindow.currentCaption = textEdt.text
-        textEdt.readOnly = true
-        textEdt.cursorVisible = false
-
-        editAct.checked = false
-    }
-
-    // Action to  start or finish caption editing
-    Action {
-        id: editAct
-        text: "Edit Caption"
-        checkable: true
-        icon.source: "qrc:/pencil"
-
-        onTriggered: {
-            if (editAct.checked) {
-                console.log("entering edit mode")
-
-                // Make edit box editable
-                textEdt.readOnly = false
-                if (textEdt.text === "") {
-                    textEdt.text = "[placeholder]"
-                }
-                textEdt.cursorVisible = true
-            }
-            else closeEditing()
-        }
-    }
-
-    Action {
-        id: previousImageAct
-        text: "Previous Image"
-        icon.source: "qrc:/back-arrow"
-
-        onTriggered: {
-            if (editAct.checked) closeEditing()
-            mainWindow.currentImageIndex =
-                    mainWindow.currentImageIndex - 1
-        }
-    }   // end previousImageAct
-
-    Action {
-        id: nextImageAct
-        text: "Next Image"
-        icon.source: "qrc:/forward-arrow"
-
-        onTriggered: {
-            // If we are in editing mode, save the edits first.
-            if (editAct.checked) closeEditing()
-
-            mainWindow.currentImageIndex =
-                    mainWindow.currentImageIndex + 1
-        }
-    }   // end nextImageAct
+    }   // end imageNavigationDrawer
 
     // The tool bar on the footer of the Main Window
     footer: ToolBar {
@@ -263,6 +318,8 @@ ApplicationWindow {
         }   // end RowLayout
 
     }   // end footerToolbar
+
+    // -- Dialogs --
 
     // Multi-purpose message dialog
     MessageDialog {

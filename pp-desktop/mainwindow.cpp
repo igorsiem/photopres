@@ -13,7 +13,6 @@
 #include "ui_mainwindow.h"
 
 #include "errorhandling.h"
-#include "thumbnailiconprovider.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
