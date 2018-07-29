@@ -34,10 +34,36 @@ ApplicationWindow {
     Timer {
         id: launcher
         triggeredOnStart: true
-        onTriggered: openAct.trigger()
+        onTriggered: {
+            // openAct.trigger()
+            mainWindow.currentImageIndex = 0
+            updateImagesListModel()
+
+        }
     }
 
     // -- Actions --
+
+    /**
+     * @brief Update the list model for the images
+     *
+     * This method is called when the images List Model needs
+     */
+    function updateImagesListModel() {
+
+        imagesListModel.clear()
+
+        var idx
+        for (idx = 0; idx < mainWindow.imagesCount; idx++)
+        {
+            imagesListModel.append({
+                "fileName": mainWindow.imageFileName(idx),
+                "fileUrl": mainWindow.imageFileNameUrl(idx) })
+        }
+
+        imagesListView.currentIndex = 0
+
+    }   // end updateImagesListModel function
 
     // Action to Open / Set the active folder
     Action {
@@ -98,6 +124,9 @@ ApplicationWindow {
             if (editAct.checked) closeEditing()
             mainWindow.currentImageIndex =
                     mainWindow.currentImageIndex - 1
+
+            imagesListView.currentIndex = mainWindow.currentImageIndex
+
         }
     }   // end previousImageAct
 
@@ -113,6 +142,9 @@ ApplicationWindow {
 
             mainWindow.currentImageIndex =
                     mainWindow.currentImageIndex + 1
+
+            imagesListView.currentIndex = mainWindow.currentImageIndex
+
         }
     }   // end nextImageAct
 
@@ -280,9 +312,81 @@ ApplicationWindow {
         width: 0.66 * parent.width
         height: parent.height
 
-        Label {
-            text: "Hello, there"
-        }
+
+        // List view of images in the current folder
+        ListView {
+
+            id: imagesListView
+            width: parent.width
+            height: parent.height
+
+            // The model supplying the data for the list view
+            model: ListModel {
+                id: imagesListModel
+
+                ListElement {
+                    fileName: "No files"
+                    fileUrl: ""
+                }
+            }
+
+            // Display item delegate - this is the structure that represents
+            // an item in the list - it is recreated for each item in
+            // `imagesListModel`.
+            delegate: Component {
+
+                // An item to hold all the visual components
+                Item {
+
+                    width: parent.width
+                    height: 100
+
+                    // A row to space out the image and the file name text
+                    Row {
+
+                        spacing: 10
+
+                        // The image thumbnail
+                        Image {
+                            source: fileUrl
+                            width: 100
+                            height: 100
+                            fillMode: Image.PreserveAspectFit
+                        }
+
+                        // The filename text
+                        Text {
+                            text: fileName
+                        }
+
+                    }   // end Row
+
+                    // Mouse area - picks up clicks on the item for selection
+                    MouseArea {
+
+                        anchors.fill: parent
+                        onClicked: {
+                            mainWindow.currentImageIndex = index
+                            imagesListView.currentIndex = index
+                        }
+
+                    }   // end Mouse Area
+
+                }   // end Item
+
+            }   // end item delegate component
+
+            // A rectangle to hightlight the selected item
+            highlight: Rectangle {
+
+                width: parent.width
+                height: 100
+                color: "lightsteelblue"
+
+            }   // end highlight rectangle
+
+        }   // end imagesListView
+
     }   // end imageNavigationDrawer
 
     // The tool bar on the footer of the Main Window
@@ -340,6 +444,8 @@ ApplicationWindow {
         onAccepted: {
             mainWindow.currentFolderUrl = folderChooser.folder
             mainWindow.currentImageIndex = 0
+
+            updateImagesListModel()
         }
 
     }   // end fileDialog

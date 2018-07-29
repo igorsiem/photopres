@@ -1,5 +1,6 @@
 #include <QDir>
 #include <QObject>
+#include <QQmlListProperty>
 #include <QSettings>
 #include <QString>
 #include <QUrl>
@@ -11,6 +12,10 @@
 
 /**
  * @brief Core functionality for the main Application Window
+ *
+ * This class is an interface between the Core library functionality and the
+ * QML UI. It mediates queries about the currently selected folder, and the
+ * list of images.
  *
  * @todo Expand class documentation
  */
@@ -117,6 +122,20 @@ class ApplicationWindow : public QObject
         { return m_core.currentImageFileNameList().size(); }
 
     /**
+     * @brief Retrieve the name of the image file at the given index
+     *
+     * @param index The index of the file name to retrieve
+     *
+     * @return The file name, or an empty string if the index is out of range
+     */
+    Q_INVOKABLE QString imageFileName(int index)
+    {
+        if ((index >= 0) && (index < m_core.currentImageFileNameList().size()))
+            return m_core.currentImageFileNameList()[index];
+        else return QString();
+    }
+
+    /**
      * @brief Move to the previous image in the folder
      */
     Q_INVOKABLE void previousImage(void)
@@ -133,7 +152,7 @@ class ApplicationWindow : public QObject
     }
 
     // The current file name, indicated by the current image index
-    Q_PROPERTY(QString currentFileName READ currentFileName)
+    Q_PROPERTY(QString currentImageFileName READ currentImageFileName)
 
     /**
      * @brief Retrieve the name of the image file currently indicated by the
@@ -142,10 +161,11 @@ class ApplicationWindow : public QObject
      * @return The image file name (without a path), or an empty string if there
      * is no current file
      */
-    QString currentFileName(void) const { return m_core.currentFileName(); }
+    QString currentImageFileName(void) const
+        { return m_core.currentFileName(); }
 
     // The full URL of the current image  file
-    Q_PROPERTY(QString currentFileNameUrl READ currentFileNameUrl)
+    Q_PROPERTY(QString currentImageFileNameUrl READ currentImageFileNameUrl)
 
     /**
      * @brief Retrieve the full URL of the file indication by the current
@@ -154,9 +174,24 @@ class ApplicationWindow : public QObject
      * @return The full URL of the current file, or an empty string if there
      * is no current file
      */
-    QString currentFileNameUrl(void) const
+    QString currentImageFileNameUrl(void) const
     {
-        auto fn = currentFileName();
+        auto fn = currentImageFileName();
+        if (fn.isEmpty()) return QString();
+        else return currentFolderUrl() + "/" + fn;
+    }
+
+    /**
+     * @brief Retrieve the URL of the image file indicated by the given index
+     *
+     * @param index The index of the image URL to retrieve
+     *
+     * @return The full URL of the image file, or an empty string if the index
+     * is out of range
+     */
+    Q_INVOKABLE QString imageFileNameUrl(int index)
+    {
+        auto fn = imageFileName(index);
         if (fn.isEmpty()) return QString();
         else return currentFolderUrl() + "/" + fn;
     }
@@ -175,7 +210,7 @@ class ApplicationWindow : public QObject
      */
     QString currentCaption(void) const
     {
-        return m_core.captionFor(currentFileName());
+        return m_core.captionFor(currentImageFileName());
     }   // end currentCaption
 
     /**
@@ -186,7 +221,7 @@ class ApplicationWindow : public QObject
      */
     void setCurrentCaption(QString ct)
     {
-        m_core.setCaptionFor(currentFileName(), std::move(ct));
+        m_core.setCaptionFor(currentImageFileName(), std::move(ct));
     }
 
     /**
