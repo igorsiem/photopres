@@ -8,6 +8,15 @@ const char* ppcore_version = "0.1";
 
 namespace PhotoPres {
 
+Core::Core(QSettings& settings) :
+    m_settings(settings),
+    m_currentImageFileNameList(nullptr),
+    m_metadata(nullptr),
+    m_currentImageIndex(0),
+    signalFolderPathChanged(nullptr),
+    signalImageIndexChanged(nullptr)
+{}
+
 std::string Core::version(void)
 {
     qDebug() << "PhotoPres Core library version " << ppcore_version;
@@ -31,6 +40,8 @@ void Core::setCurrentFolderPath(QString cf)
     // be deleted automatically.
     m_currentImageFileNameList = nullptr;
     m_metadata = nullptr;
+
+    if (signalFolderPathChanged) signalFolderPathChanged(cf);
 }   // end setCurrentFolder method
 
 const QStringList& Core::currentImageFileNameList(void) const
@@ -92,6 +103,8 @@ void Core::setCurrentImageIndex(int cii)
     else if (cii > m_currentImageFileNameList->size()-1)
         m_currentImageIndex = m_currentImageFileNameList->size()-1;
     else m_currentImageIndex = cii;
+
+    if (signalImageIndexChanged) signalImageIndexChanged(m_currentImageIndex);
 }   // end setCurrentImageIndex
 
 QString Core::currentFileName(void) const

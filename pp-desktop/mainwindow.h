@@ -9,6 +9,7 @@
 #include <core.h>
 
 #include "clickablelabel.h"
+#include "coreimagemodel.h"
 
 /**
  * \brief User Interface elements
@@ -54,11 +55,7 @@ class MainWindow : public QMainWindow
      * @param event The 'Show Event' (passed on to the base class
      * implementation)
      */
-    virtual void showEvent(QShowEvent* event) override
-    {
-        QMainWindow::showEvent(event);
-        setCurrentImageIndex(0);
-    }
+    virtual void showEvent(QShowEvent* event) override;
 
     private slots:
 
@@ -91,6 +88,14 @@ class MainWindow : public QMainWindow
     void on_nextImageAct_triggered();
 
     // --- Internal Declarations ---
+
+    /**
+     * @brief Select a file when it is clicked in the list view
+     *
+     * @param index The index object; the row of this is assumed to be the index
+     * of the image
+     */
+    void on_imagesLvw_clicked(const QModelIndex &index);
 
 private:
 
@@ -146,7 +151,16 @@ private:
      */
     PhotoPres::Core m_core;
 
+    /**
+     * @brief The label that displays the current image
+     */
     ClickableLabel* m_imageLbl;
+
+    /**
+     * @brief The data model for the Files list view
+     */
+    // QFileSystemModel* m_filesModel;
+    CoreImageModel* m_imagesModel;
 
 };  // end MainWindow class
 

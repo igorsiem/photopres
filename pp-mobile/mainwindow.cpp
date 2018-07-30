@@ -57,7 +57,7 @@ void ApplicationWindow::setCurrentImageIndex(int cii)
     PPM_TOP_LEVEL_TRY
     {
         m_core.setCurrentImageIndex(cii);
-        auto imageFileUrl = currentFileNameUrl();
+        auto imageFileUrl = currentImageFileNameUrl();
         if (!imageFileUrl.isEmpty()) emit displayImage(imageFileUrl);
     }
     PPM_TOP_LEVEL_CATCH("Loading and Displaying an Image")
